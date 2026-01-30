@@ -1,18 +1,55 @@
-import * as React from "react"
+import React from 'react'
 
-import { cn } from "@/lib/utils"
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string
+  error?: string
+  helperText?: string
+  resize?: 'none' | 'vertical' | 'horizontal' | 'both'
+  rows?: number
+}
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+const Textarea: React.FC<TextareaProps> = ({ 
+  label, 
+  error, 
+  helperText,
+  resize = 'vertical',
+  rows = 4,
+  className = '',
+  ...props 
+}) => {
+  
+  const resizeClasses = {
+    none: 'resize-none',
+    vertical: 'resize-y',
+    horizontal: 'resize-x',
+    both: 'resize'
+  }
+  
   return (
-    <textarea
-      data-slot="textarea"
-      className={cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
+    <div className="w-full">
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
       )}
-      {...props}
-    />
+      <textarea
+        rows={rows}
+        className={`
+          w-full px-3 py-2 border rounded-lg
+          focus:outline-none focus:ring-2 focus:border-primary
+          ${error ? 'border-danger focus:ring-danger' : 'border-gray-300 focus:ring-primary'}
+          ${resizeClasses[resize]}
+          ${className}
+        `}
+        {...props}
+      />
+      {(error || helperText) && (
+        <p className={`mt-1 text-sm ${error ? 'text-danger' : 'text-gray-500'}`}>
+          {error || helperText}
+        </p>
+      )}
+    </div>
   )
 }
 
-export { Textarea }
+export default Textarea

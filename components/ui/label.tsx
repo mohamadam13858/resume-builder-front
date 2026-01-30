@@ -1,24 +1,78 @@
-"use client"
+import React from 'react'
 
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
+interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  htmlFor?: string
+  required?: boolean
+  optional?: boolean
+  className?: string
+}
 
-import { cn } from "@/lib/utils"
-
-function Label({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+const Label: React.FC<LabelProps> = ({ 
+  children, 
+  htmlFor, 
+  required = false,
+  optional = false,
+  className = '',
+  ...props 
+}) => {
   return (
-    <LabelPrimitive.Root
-      data-slot="label"
-      className={cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      )}
+    <label
+      htmlFor={htmlFor}
+      className={`
+        block text-sm font-medium text-gray-700 mb-1
+        ${className}
+      `}
       {...props}
-    />
+    >
+      {children}
+      {required && (
+        <span className="text-red-500 mr-1">*</span>
+      )}
+      {optional && (
+        <span className="text-gray-400 text-xs font-normal mr-2">
+          (اختیاری)
+        </span>
+      )}
+    </label>
   )
 }
 
-export { Label }
+
+export function InlineLabel({ 
+  children, 
+  className = '',
+  ...props 
+}: Omit<LabelProps, 'required' | 'optional'>) {
+  return (
+    <label
+      className={`
+        inline-flex items-center text-sm font-medium text-gray-700
+        ${className}
+      `}
+      {...props}
+    >
+      {children}
+    </label>
+  )
+}
+
+
+export function CheckboxLabel({ 
+  children, 
+  className = '',
+  ...props 
+}: Omit<LabelProps, 'required' | 'optional'>) {
+  return (
+    <label
+      className={`
+        flex items-center text-sm text-gray-700 cursor-pointer
+        ${className}
+      `}
+      {...props}
+    >
+      {children}
+    </label>
+  )
+}
+
+export default Label
