@@ -108,7 +108,7 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3 space-x-reverse">
+              <div className="flex items-center gap-3 space-x-3 space-x-reverse">
                 <Link href="/login">
                   <Button variant="outline" size="sm">
                     ورود
