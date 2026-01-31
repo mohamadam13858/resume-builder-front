@@ -49,7 +49,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({
     
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 space-x-reverse">
+          <div className="flex items-center gap-3 space-x-3 space-x-reverse">
             <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${getTemplateColor(resume.theme.template)}`}>
               <FileText className="h-5 w-5" />
             </div>

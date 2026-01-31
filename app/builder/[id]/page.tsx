@@ -32,20 +32,20 @@ export default function BuilderPage() {
   const activeResume = getActiveResume()
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
-    }
+      // if (!isAuthenticated) {
+      //   router.push('/login')
+      //   return
+      // }
 
-    const resumeExists = resumes.some(r => r.id === resumeId)
-    if (!resumeExists) {
-      setError('رزومه مورد نظر یافت نشد')
-      setIsLoading(false)
-      return
-    }
+      // const resumeExists = resumes.some(r => r.id === resumeId)
+      // if (!resumeExists) {
+      //   setError('رزومه مورد نظر یافت نشد')
+      //   setIsLoading(false)
+      //   return
+      // }
 
 
-    setActiveResume(resumeId)
+      // setActiveResume(resumeId)
     setIsLoading(false)
   }, [resumeId, isAuthenticated, router, resumes, setActiveResume])
 

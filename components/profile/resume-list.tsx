@@ -113,7 +113,6 @@ const ResumeList = () => {
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 type="text"
-                placeholder="جستجو در رزومه‌ها..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10"
@@ -121,7 +120,7 @@ const ResumeList = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 space-x-reverse">
+          <div className="flex items-center gap-3 space-x-4 space-x-reverse">
 
             <div className="flex border border-gray-300 rounded-lg">
               <button
@@ -176,7 +175,7 @@ const ResumeList = () => {
             <Card key={resume.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-4 border-b">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 space-x-reverse">
+                  <div className="flex gap-3 items-center space-x-3 space-x-reverse">
                     <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
                       resume.theme.template === 'modern' ? 'bg-blue-100 text-blue-600' :
                       resume.theme.template === 'classic' ? 'bg-gray-100 text-gray-600' :

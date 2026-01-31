@@ -216,7 +216,7 @@ export default function DashboardPage() {
             </div>
             
             <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="flex border border-gray-300 rounded-lg">
+              <div className="flex border border-gray-300 rounded-lg mx-2 ">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}

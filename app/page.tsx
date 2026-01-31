@@ -100,7 +100,7 @@ export default function HomePage() {
                 <>
                   <Link href="/dashboard">
                     <Button size="lg" leftIcon={<FileText className="h-5 w-5" />}>
-                      رفتن به داشبورد
+                    رفتن به داشبورد
                     </Button>
                   </Link>
                   <Link href="/builder">
@@ -254,13 +254,13 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isAuthenticated ? (
               <Link href="/builder">
-                <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                <Button variant='outline' size="lg" className="border-white text-white hover:bg-white/10">
                   ساخت رزومه جدید
                 </Button>
               </Link>
             ) : (
               <Link href="/register">
-                <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                <Button variant='outline' size="lg" className="border-white text-white hover:bg-white/10">
                   شروع رایگان
                 </Button>
               </Link>

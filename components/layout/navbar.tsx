@@ -42,8 +42,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-3 space-x-reverse">
+          <div className="flex items-center ">
+            <Link href="/" className="flex items-center gap-3 space-x-3 space-x-reverse">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <FileText className="h-5 w-5 text-white" />
               </div>
@@ -82,7 +82,7 @@ const Navbar = () => {
 
             
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4 space-x-reverse">
+              <div className="flex items-center space-x-4 gap-4 space-x-reverse">
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Avatar
                     src={user?.avatar}
@@ -104,7 +104,7 @@ const Navbar = () => {
                   onClick={handleLogout}
                   leftIcon={<LogOut className="h-4 w-4" />}
                 >
-                  خروج
+                  <span className='mr-1.5'>خروج</span>
                 </Button>
               </div>
             ) : (
