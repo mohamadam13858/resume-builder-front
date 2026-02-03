@@ -47,6 +47,7 @@ export default function LoginPage() {
       await login(data.email, data.password)
       router.push('/dashboard')
     } catch (error) {
+      console.log(error , 'error')
       // Error is handled in the store
     }
   }

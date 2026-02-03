@@ -6,6 +6,7 @@ export interface User {
   avatar?: string;
   bio?: string;
   createdAt: Date;
+  phone?:string
 }
 
 export interface PersonalInfo {
