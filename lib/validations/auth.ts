@@ -16,7 +16,7 @@ export type LoginFormData = z.infer<typeof loginSchema>
 
 
 export const registerSchema = z.object({
-  name: z
+  fullName: z
     .string()
     .min(1, 'نام و نام خانوادگی الزامی است')
     .min(3, 'نام باید حداقل ۳ کاراکتر باشد'),

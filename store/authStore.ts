@@ -85,14 +85,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       
-      register: async (email: string, password: string, name: string) => {
+      register: async (email: string, password: string, fullName: string) => {
         set({ isLoading: true, error: null });
         
         try {
           const response = await authService.register({
             email,
             password,
-            name,
+            fullName,
           });
           
           TokenService.setTokens(

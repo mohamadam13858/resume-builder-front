@@ -40,7 +40,7 @@ export default function RegisterPage() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: '',
+      fullName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -61,9 +61,10 @@ export default function RegisterPage() {
   }
 
   const onSubmit = async (data: RegisterFormData) => {
+    console.log(data)
     clearError()
     try {
-      await registerUser(data.email, data.password, data.name)
+      await registerUser(data.email, data.password, data.fullName)
       router.push('/dashboard')
     } catch (error) {
       // Error is handled in the store
@@ -113,23 +114,23 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
     
             <div>
-              <Label htmlFor="name" required>
+              <Label htmlFor="fullName" required>
                 نام و نام خانوادگی
               </Label>
               <div className="mt-1 relative">
                 <Input
-                  id="name"
+                  id="fullName"
                   type="text"
                   placeholder="علی احمدی"
-                  error={errors.name?.message}
+                  error={errors.fullName?.message}
                   leftIcon={<User className="h-5 w-5" />}
                   className="pl-10"
-                  {...register('name')}
+                  {...register('fullName')}
                 />
               </div>
-              {errors.name && (
+              {errors.fullName && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.name.message}
+                  {errors.fullName.message}
                 </p>
               )}
             </div>
