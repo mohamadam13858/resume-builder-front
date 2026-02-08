@@ -1,94 +1,113 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { TokenService } from './tokenService';
-import { authService } from './authService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-axios.interceptors.request.use(
-  async (config) => {
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
+
+const processQueue = (error: any = null) => {
+  failedQueue.forEach((prom) => {
+    error ? prom.reject(error) : prom.resolve(null);
+  });
+  failedQueue = [];
+};
+
+api.interceptors.request.use(
+  (config) => {
     const token = TokenService.getAccessToken();
-    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-
-    if (TokenService.shouldRefreshToken() && !config.url?.includes('/auth/refresh')) {
-      const refreshToken = TokenService.getRefreshToken();
-      
-      if (refreshToken && TokenService.isTokenValid(refreshToken)) {
-        try {
-          const { access_token } = await authService.refreshToken(refreshToken);
-          TokenService.setTokens(
-            access_token,
-            refreshToken,
-            TokenService.getUser()
-          );
-          config.headers.Authorization = `Bearer ${access_token}`;
-        } catch (error) {
-          TokenService.clearTokens();
-          window.location.href = '/login';
-          console.log(error)
-        }
-      }
-    }
-    
     return config;
   },
-  (error) => console.log(error)
+  (error) => Promise.reject(error)
 );
 
-axios.interceptors.response.use(
+api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            originalRequest.headers.Authorization = `Bearer ${TokenService.getAccessToken()}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
-      
-      const refreshToken = TokenService.getRefreshToken();
-      
-      if (refreshToken) {
-        try {
-          const { access_token } = await authService.refreshToken(refreshToken);
-          TokenService.setTokens(
-            access_token,
-            refreshToken,
-            TokenService.getUser()
-          );
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return axios(originalRequest);
-        } catch (refreshError) {
-          TokenService.clearTokens();
-          window.location.href = '/login';
+      isRefreshing = true;
+
+      try {
+        const refreshToken = TokenService.getRefreshToken();
+
+        if (!refreshToken || !TokenService.isTokenValid(refreshToken)) {
+          throw new Error('Refresh token نامعتبر یا وجود ندارد');
         }
-      } else {
+        const response = await axios.post(`${API_URL}/auth/refresh`, {
+          refreshToken,
+        });
+
+        const { access_token, refresh_token } = response.data;
+
+        TokenService.setTokens(
+          access_token,
+          refresh_token || refreshToken, 
+          TokenService.getUser()
+        );
+
+
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        processQueue();
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error('Refresh token failed:', refreshError);
+
+        processQueue(refreshError);
+
+        // شکست کامل → لاگ‌اوت
         TokenService.clearTokens();
-        window.location.href = '/login';
+
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login?session_expired=true';
+        }
+
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
-    
+    return Promise.reject(error);
   }
 );
 
+
 const httpService = async <T = unknown>(
   url: string,
-  method: HttpMethod,
-  data?: any
-): Promise<AxiosResponse<T>> => {
-  const config: AxiosRequestConfig = {
-    url: `${API_URL}${url}`,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  data?: any,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  const response = await api({
+    url,
     method,
     data,
-    headers: {
-      'Content-Type': data instanceof FormData 
-        ? 'multipart/form-data' 
-        : 'application/json'
-    }
-  };
-  
-  return axios(config);
+    ...config,
+  });
+
+  return response.data;
 };
 
 export default httpService;

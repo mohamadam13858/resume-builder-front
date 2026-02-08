@@ -67,7 +67,7 @@ export default function RegisterPage() {
       await registerUser(data.email, data.password, data.fullName)
       router.push('/dashboard')
     } catch (error) {
-      // Error is handled in the store
+      console.log(error)
     }
   }
 
@@ -294,7 +294,7 @@ export default function RegisterPage() {
             </div>
 
         
-            <div className="flex items-start">
+            {/* <div className="flex items-start">
               <input
                 id="agreeToTerms"
                 type="checkbox"
@@ -339,7 +339,7 @@ export default function RegisterPage() {
                   )}
                 </div>
               </label>
-            </div>
+            </div> */}
 
         
             <Button
@@ -353,7 +353,7 @@ export default function RegisterPage() {
             </Button>
 
             
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -388,7 +388,7 @@ export default function RegisterPage() {
                 </svg>
                 <span className="text-sm font-medium text-gray-700">فیس‌بوک</span>
               </button>
-            </div>
+            </div> */}
 
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">

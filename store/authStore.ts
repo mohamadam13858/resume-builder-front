@@ -23,6 +23,7 @@ interface AuthState {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) => Promise<void>;
   clearError: () => void;
   getUserInitials: () => string;
   isLoggedIn: () => boolean;
@@ -158,6 +159,33 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({ 
             error: error.message || 'خطا در بروزرسانی پروفایل',
+          });
+          throw error;
+        }
+      },
+
+      changePassword: async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+        try {
+          const token = TokenService.getAccessToken();
+          if (!token) throw new Error('توکن معتبری وجود ندارد');
+          
+          if (newPassword !== confirmPassword) {
+            throw new Error('رمز عبور جدید و تأیید آن مطابقت ندارند');
+          }
+
+          if (newPassword.length < 6) {
+            throw new Error('رمز عبور باید حداقل ۶ کاراکتر باشد');
+          }
+
+          await authService.changePassword({
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            confirmPassword: confirmPassword
+          });
+          
+        } catch (error: any) {
+          set({ 
+            error: error.message || 'خطا در تغییر رمز عبور',
           });
           throw error;
         }

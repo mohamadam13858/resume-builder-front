@@ -1,4 +1,4 @@
-// services/tokenService.ts
+
 import { jwtDecode } from 'jwt-decode';
 
 interface TokenPayload {
@@ -75,6 +75,7 @@ export class TokenService {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem('auth-storage')
   }
 
 

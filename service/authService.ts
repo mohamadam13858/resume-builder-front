@@ -39,14 +39,14 @@ export interface UserProfile {
 }
 
 class AuthService {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  async login(credentials: LoginCredentials) {
     try {
-      const response = await httpService(`/auth/login` , 'POST', credentials);
-      return response.data as any;
+      const response = await httpService(`/auth/login`, 'POST', credentials);
+      return response as any;
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || 
-        error.response?.data?.error || 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
         'خطا در ورود'
       );
     }
@@ -55,51 +55,64 @@ class AuthService {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await httpService(`/auth/register`,  'POST' , data);
-      return response.data as any;
+      const response = await httpService(`/auth/register`, 'POST', data);
+      return response as any;
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || 
-        error.response?.data?.error || 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
         'خطا در ثبت‌نام'
       );
     }
   }
 
 
-  async refreshToken(refreshToken: string): Promise<{ access_token: string }> {
+  async refreshToken(refreshToken: string): Promise<any> {
     try {
-      const response = await axios.post(`${API_URL}/auth/refresh`, {
+      const response = await httpService(`/auth/refresh`, 'POST', {
         refresh_token: refreshToken
       });
-      return response.data;
+      return response;
     } catch (error) {
       throw new Error('خطا در تازه‌سازی توکن');
     }
   }
 
 
-  async getProfile(token: string): Promise<UserProfile> {
+  async getProfile(token: string): Promise<any> {
     try {
       const response = await httpService('/auth/profile', 'GET');
-      return response.data as any;
+      return response;
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || 
+        error.response?.data?.message ||
         'خطا در دریافت اطلاعات کاربر'
       );
     }
   }
 
 
-  async updateProfile(data: Partial<UserProfile>, token: string): Promise<UserProfile> {
+  async updateProfile(data: Partial<UserProfile>, token: string): Promise<any> {
     try {
       const response = await httpService('/auth/profile', 'PUT', data);
-      return response.data as any;
+      return response as any;
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || 
+        error.response?.data?.message ||
         'خطا در بروزرسانی پروفایل'
+      );
+    }
+  }
+
+
+  async changePassword(data: any): Promise<any> {
+    try {
+      const response = await httpService('/auth/change-password', 'PATCH', data)
+      return response as any
+    } catch (error : any) {
+      throw new Error(
+        error.response?.data?.message ||
+        'خطا در تغییر رمز'
       );
     }
   }
