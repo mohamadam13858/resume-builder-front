@@ -63,14 +63,8 @@ const quickStarts = [
 
 export default function BuilderHomePage() {
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
   const { resumes, createResume } = useResumeStore()
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, router])
 
   const handleCreateResume = (template?: string) => {
     const newResumeId = createResume(template ? `رزومه ${template}` : 'رزومه جدید')
@@ -81,9 +75,6 @@ export default function BuilderHomePage() {
     router.push(`/builder/${resumeId}`)
   }
 
-  if (!isAuthenticated) {
-    return null
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

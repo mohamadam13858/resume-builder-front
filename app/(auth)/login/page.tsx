@@ -45,6 +45,7 @@ export default function LoginPage() {
     clearError()
     try {
       await login(data.email, data.password)
+      document.cookie = 'auth_session=true; path=/; max-age=86400; SameSite=Lax';
       router.push('/dashboard')
     } catch (error) {
       console.log(error , 'error')

@@ -4,13 +4,13 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { useRouter } from 'next/navigation'
-import { 
-  Home, 
-  FileText, 
-  User, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  Home,
+  FileText,
+  User,
+  Settings,
+  LogOut,
+  Menu,
   X,
   Palette,
   Moon,
@@ -27,6 +27,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout()
+    document.cookie = 'auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     router.push('/login')
   }
 
@@ -53,9 +54,9 @@ const Navbar = () => {
             </Link>
           </div>
 
-          
+
           <div className="hidden md:flex items-center space-x-4 space-x-reverse">
-            
+
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -67,7 +68,7 @@ const Navbar = () => {
               </Link>
             ))}
 
-    
+
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 text-gray-600 hover:text-primary transition-colors"
@@ -80,7 +81,7 @@ const Navbar = () => {
               )}
             </button>
 
-            
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-4 gap-4 space-x-reverse">
                 <div className="flex items-center space-x-3 space-x-reverse">
@@ -123,7 +124,7 @@ const Navbar = () => {
             )}
           </div>
 
-        
+
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -155,10 +156,10 @@ const Navbar = () => {
               </Link>
             ))}
 
-    
+
             <div className="border-t border-gray-200 my-2" />
 
-        
+
             {isAuthenticated ? (
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 space-x-reverse px-3 py-2">

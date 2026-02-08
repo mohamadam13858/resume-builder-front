@@ -45,12 +45,6 @@ export default function DashboardPage() {
   const [selectedResume, setSelectedResume] = useState<string | null>(null)
   const [importModalOpen, setImportModalOpen] = useState(false)
 
-
-  if (!isAuthenticated) {
-    router.push('/login')
-    return null
-  }
-
   
   const filteredResumes = resumes.filter(resume =>
     resume.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

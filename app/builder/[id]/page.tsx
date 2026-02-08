@@ -14,7 +14,6 @@ import Loader from '@/components/ui/loader'
 export default function BuilderPage() {
   const params = useParams()
   const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
   const { 
     getActiveResume, 
     setActiveResume, 
@@ -32,22 +31,17 @@ export default function BuilderPage() {
   const activeResume = getActiveResume()
 
   useEffect(() => {
-      // if (!isAuthenticated) {
-      //   router.push('/login')
-      //   return
-      // }
-
-      // const resumeExists = resumes.some(r => r.id === resumeId)
-      // if (!resumeExists) {
-      //   setError('رزومه مورد نظر یافت نشد')
-      //   setIsLoading(false)
-      //   return
-      // }
+      const resumeExists = resumes.some(r => r.id === resumeId)
+      if (!resumeExists) {
+        setError('رزومه مورد نظر یافت نشد')
+        setIsLoading(false)
+        return
+      }
 
 
-      // setActiveResume(resumeId)
+      setActiveResume(resumeId)
     setIsLoading(false)
-  }, [resumeId, isAuthenticated, router, resumes, setActiveResume])
+  }, [resumeId, , router, setActiveResume])
 
   const handleSave = async () => {
     if (!activeResume) return
@@ -97,9 +91,7 @@ export default function BuilderPage() {
       })
   }
 
-  if (!isAuthenticated) {
-    return null
-  }
+
 
   if (isLoading) {
     return (

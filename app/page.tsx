@@ -5,17 +5,18 @@ import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import Button from '@/components/ui/button'
 import Card from '@/components/ui/card'
-import { 
-  FileText, 
-  Palette, 
-  Download, 
-  Users, 
+import {
+  FileText,
+  Palette,
+  Download,
+  Users,
   Shield,
   Sparkles,
   ArrowLeft,
   ArrowRight,
   CheckCircle
 } from 'lucide-react'
+import { TokenService } from '@/service/tokenService'
 
 const features = [
   {
@@ -72,8 +73,8 @@ const testimonials = [
 ]
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuthStore()
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const token = TokenService.getAccessToken();
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
@@ -92,15 +93,15 @@ export default function HomePage() {
               رزومه‌ای که <span className="text-primary">شغل</span> می‌آورد
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              با ابزار ساخت رزومه حرفه‌ای ما، در چند دقیقه رزومه‌ای چشمگیر بسازید 
+              با ابزار ساخت رزومه حرفه‌ای ما، در چند دقیقه رزومه‌ای چشمگیر بسازید
               و شانس استخدام خود را افزایش دهید.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {isAuthenticated ? (
+              {token ? (
                 <>
                   <Link href="/dashboard">
                     <Button size="lg" leftIcon={<FileText className="h-5 w-5" />}>
-                    رفتن به داشبورد
+                      رفتن به داشبورد
                     </Button>
                   </Link>
                   <Link href="/builder">
@@ -157,7 +158,7 @@ export default function HomePage() {
         </div>
       </section>
 
-    
+
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -193,7 +194,7 @@ export default function HomePage() {
         </div>
       </section>
 
-  
+
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -242,7 +243,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      
+
       <section className="py-16 bg-gradient-to-r from-primary to-secondary">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
@@ -252,7 +253,7 @@ export default function HomePage() {
             رایگان شروع کنید. هیچ کارت اعتباری نیاز نیست.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {isAuthenticated ? (
+            {token ? (
               <Link href="/builder">
                 <Button variant='outline' size="lg" className="border-white text-white hover:bg-white/10">
                   ساخت رزومه جدید
@@ -266,8 +267,8 @@ export default function HomePage() {
               </Link>
             )}
             <Link href="/dashboard">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 className="border-white text-white hover:bg-white/10"
               >

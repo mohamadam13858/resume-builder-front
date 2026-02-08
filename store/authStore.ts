@@ -117,19 +117,12 @@ export const useAuthStore = create<AuthState>()(
       },
       
       logout: async () => {
-        try {
-          const token = TokenService.getAccessToken();
-          if (token) {
-            await authService.logout(token);
-          }
-        } finally {
           TokenService.clearTokens();
           set({
             user: null,
             isAuthenticated: false,
             error: null,
           });
-        }
       },
       
       updateProfile: async (data: Partial<User>) => {
