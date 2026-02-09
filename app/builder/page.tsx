@@ -1,336 +1,206 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/authStore'
-import { useResumeStore } from '@/store/resumeStore'
-import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
-import { ArrowRight, Clock, Download, FileText, LayoutTemplate, Sparkles, Users } from 'lucide-react'
-
+import Card from '@/components/ui/card'
+import {
+  ArrowRight,
+  Plus,
+  LayoutTemplate,
+  Sparkles,
+  FileText,
+  Clock,
+  Users,
+  Download,
+} from 'lucide-react'
 
 const templates = [
   {
     id: 'modern',
     name: 'مدرن',
-    description: 'طراحی مدرن و مینیمال',
-    color: 'bg-blue-500',
-    popular: true
+    description: 'طراحی مدرن، حرفه‌ای و مینیمال',
+    color: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+    popular: true,
   },
   {
     id: 'classic',
     name: 'کلاسیک',
-    description: 'طراحی کلاسیک و رسمی',
-    color: 'bg-gray-600',
-    popular: false
+    description: 'ظاهر رسمی و سنتی',
+    color: 'bg-gradient-to-br from-gray-700 to-gray-900',
+    popular: false,
   },
   {
     id: 'minimal',
     name: 'مینیمال',
-    description: 'طراحی ساده و تمیز',
-    color: 'bg-green-500',
-    popular: true
+    description: 'ساده، تمیز و بسیار خوانا',
+    color: 'bg-gradient-to-br from-emerald-500 to-teal-600',
+    popular: true,
   },
   {
     id: 'creative',
     name: 'خلاق',
-    description: 'طراحی خلاقانه و رنگارنگ',
-    color: 'bg-purple-500',
-    popular: false
-  }
+    description: 'رنگارنگ و متفاوت',
+    color: 'bg-gradient-to-br from-purple-500 to-pink-600',
+    popular: false,
+  },
 ]
 
-const quickStarts = [
+const quickActions = [
   {
-    title: 'از صفر شروع کن',
-    description: 'یک رزومه خالی ایجاد کن',
-    icon: <FileText className="h-6 w-6" />,
-    color: 'bg-blue-100 text-blue-600'
+    title: 'ایجاد رزومه جدید',
+    description: 'از صفر شروع کنید',
+    icon: <Plus className="h-6 w-6" />,
+    color: 'bg-blue-100 text-blue-700',
+    href: '/builder/new',
   },
   {
-    title: 'از نمونه استفاده کن',
-    description: 'از میان نمونه‌های آماده انتخاب کن',
+    title: 'انتخاب از قالب‌های آماده',
+    description: 'قالب‌های حرفه‌ای را ببینید',
     icon: <LayoutTemplate className="h-6 w-6" />,
-    color: 'bg-purple-100 text-purple-600'
+    color: 'bg-purple-100 text-purple-700',
+    href: '/templates',
   },
   {
-    title: 'رزومه موجود را ویرایش کن',
-    description: 'یکی از رزومه‌های قبلی را ویرایش کن',
+    title: 'ادامه رزومه‌های قبلی',
+    description: 'رزومه‌های در حال ساخت خود را ببینید',
     icon: <Sparkles className="h-6 w-6" />,
-    color: 'bg-green-100 text-green-600'
-  }
+    color: 'bg-amber-100 text-amber-700',
+    href: '/dashboard',
+  },
 ]
 
 export default function BuilderHomePage() {
   const router = useRouter()
-  const { resumes, createResume } = useResumeStore()
-
-
-  const handleCreateResume = (template?: string) => {
-    const newResumeId = createResume(template ? `رزومه ${template}` : 'رزومه جدید')
-    router.push(`/builder/${newResumeId}`)
-  }
-
-  const handleContinueResume = (resumeId: string) => {
-    router.push(`/builder/${resumeId}`)
-  }
-
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              رزومه خود را بسازید
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              رزومه حرفه‌ای خود را بسازید
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              با استفاده از قالب‌های حرفه‌ای و ابزارهای قدرتمند ما، رزومه‌ای چشمگیر 
-              بسازید که نظر کارفرمایان را جلب کند.
+              با استفاده از قالب‌های جذاب و ابزارهای ساده، رزومه‌ای بسازید که کارفرمایان را تحت تأثیر قرار دهد.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center md:text-right">
             شروع سریع
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {quickStarts.map((item, index) => (
+            {quickActions.map((item) => (
               <button
-                key={index}
-                onClick={() => {
-                  if (index === 0) handleCreateResume()
-                  else if (index === 1) router.push('/templates')
-                  else router.push('/dashboard')
-                }}
-                className="text-left p-6 border border-gray-200 rounded-xl hover:border-primary hover:shadow-md transition-all"
+                key={item.title}
+                onClick={() => router.push(item.href)}
+                className="
+                  group bg-white border border-gray-200 rounded-2xl p-6
+                  hover:border-blue-500 hover:shadow-lg transition-all duration-200
+                  text-right
+                "
               >
-                <div className={`h-12 w-12 rounded-lg flex items-center justify-center mb-4 ${item.color}`}>
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
                   {item.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-700 transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  {item.description}
-                </p>
-                <div className="flex items-center text-primary">
-                  <span>شروع کنید</span>
-                  <ArrowRight className="h-4 w-4 mr-2" />
+                <p className="text-gray-600 mb-4">{item.description}</p>
+                <div className="flex items-center text-blue-600 font-medium">
+                  شروع کنید
+                  <ArrowRight className="h-4 w-4 mr-2 transition-transform group-hover:translate-x-1" />
                 </div>
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        
-        {resumes.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                رزومه‌های اخیر
-              </h2>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard')}
-              >
-                مشاهده همه
-              </Button>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resumes.slice(0, 3).map((resume) => (
-                <Card key={resume.id} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3 space-x-reverse">
-                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                        resume.theme.template === 'modern' ? 'bg-blue-100 text-blue-600' :
-                        resume.theme.template === 'classic' ? 'bg-gray-100 text-gray-600' :
-                        resume.theme.template === 'minimal' ? 'bg-green-100 text-green-600' :
-                        'bg-purple-100 text-purple-600'
-                      }`}>
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
-                          {resume.title}
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {resume.personal.name || 'بدون نام'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {resume.isPublic ? (
-                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                        عمومی
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                        خصوصی
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 ml-2" />
-                      <span>
-                        آخرین ویرایش: {new Date(resume.updatedAt).toLocaleDateString('fa-IR')}
-                      </span>
-                    </div>
-                    
-                    {resume.viewCount > 0 && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Users className="h-4 w-4 ml-2" />
-                        <span>{resume.viewCount} بازدید</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleContinueResume(resume.id)}
-                    >
-                      ادامه ویرایش
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => {
-                        // Handle duplicate
-                      }}
-                    >
-                      <Download className="h-4 w-4 ml-2" />
-                      خروجی
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center md:text-right">
             انتخاب قالب
           </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {templates.map((template) => (
               <div
                 key={template.id}
-                className={`border rounded-xl overflow-hidden hover:shadow-lg transition-all ${
-                  template.popular ? 'ring-2 ring-primary ring-opacity-50' : ''
-                }`}
+                className={`
+                  border rounded-2xl overflow-hidden bg-white
+                  hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group
+                  ${template.popular ? 'ring-2 ring-blue-400 ring-opacity-40' : ''}
+                `}
               >
-                
-                <div className={`h-40 ${template.color} relative`}>
+                <div className={`h-48 ${template.color} relative flex items-center justify-center`}>
                   {template.popular && (
-                    <div className="absolute top-3 left-3 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                    <div className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                       پرطرفدار
                     </div>
                   )}
-                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <div className="flex space-x-1 space-x-reverse">
-                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
-                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
-                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
-                    </div>
-                  </div>
+                  <span className="text-white text-5xl font-bold opacity-40 group-hover:opacity-70 transition-opacity">
+                    {template.name}
+                  </span>
                 </div>
 
-            
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">
-                      {template.name}
-                    </h3>
-                    {template.popular && (
-                      <Sparkles className="h-4 w-4 text-yellow-500" />
-                    )}
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-bold text-lg">{template.name}</h3>
+                    {template.popular && <Sparkles className="h-5 w-5 text-yellow-500" />}
                   </div>
-                  
-                  <p className="text-sm text-gray-600 mb-4">
-                    {template.description}
-                  </p>
+                  <p className="text-gray-600 text-sm mb-5">{template.description}</p>
 
                   <Button
                     fullWidth
                     variant={template.popular ? 'primary' : 'outline'}
-                    onClick={() => handleCreateResume(template.name)}
+                    onClick={() => router.push(`/builder/new?template=${template.id}`)}
                   >
-                    انتخاب قالب
+                    استفاده از این قالب
                   </Button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-
-        <div className="mt-12">
-          <Card className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between">
+    
+        <section>
+          <Card className="p-8 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  نکات برای رزومه بهتر
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  نکات ساخت رزومه حرفه‌ای
                 </h3>
-                <p className="text-gray-600">
-                  از این نکات برای ساخت رزومه‌ای تاثیرگذار استفاده کنید
+                <p className="text-gray-700">
+                  با رعایت این موارد شانس موفقیت خود را بالا ببرید
                 </p>
               </div>
-              
-              <div className="mt-4 md:mt-0">
-                <Button
-                  variant="outline"
-                  onClick={() => router.push('/tips')}
-                >
-                  مشاهده همه نکات
-                </Button>
-              </div>
+              <Button variant="outline">
+                <a href="/tips">مشاهده همه نکات ←</a>
+              </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div className="p-4 bg-white rounded-lg">
-                <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <span className="text-blue-600 font-bold">۱</span>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { num: '۱', title: 'مختصر و مفید', desc: '۱ تا ۲ صفحه کافی است' },
+                { num: '۲', title: 'کلمات کلیدی', desc: 'از کلمات مرتبط با شغل استفاده کنید' },
+                { num: '۳', title: 'قالب مناسب', desc: 'قالب را با حوزه کاری هماهنگ کنید' },
+              ].map((item) => (
+                <div key={item.num} className="bg-white p-6 rounded-xl shadow-sm border">
+                  <div className="h-10 w-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xl mb-4">
+                    {item.num}
+                  </div>
+                  <h4 className="font-semibold mb-2">{item.title}</h4>
+                  <p className="text-gray-600 text-sm">{item.desc}</p>
                 </div>
-                <h4 className="font-medium text-gray-900 mb-2">مختصر و مفید</h4>
-                <p className="text-sm text-gray-600">
-                  رزومه خود را در ۱-۲ صفحه خلاصه کنید
-                </p>
-              </div>
-
-              <div className="p-4 bg-white rounded-lg">
-                <div className="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center mb-3">
-                  <span className="text-green-600 font-bold">۲</span>
-                </div>
-                <h4 className="font-medium text-gray-900 mb-2">کلمات کلیدی</h4>
-                <p className="text-sm text-gray-600">
-                  از کلمات کلیدی مرتبط با شغل استفاده کنید
-                </p>
-              </div>
-
-              <div className="p-4 bg-white rounded-lg">
-                <div className="h-8 w-8 bg-purple-100 rounded-lg flex items-center justify-center mb-3">
-                  <span className="text-purple-600 font-bold">۳</span>
-                </div>
-                <h4 className="font-medium text-gray-900 mb-2">قالب مناسب</h4>
-                <p className="text-sm text-gray-600">
-                  قالب را متناسب با صنعت انتخاب کنید
-                </p>
-              </div>
+              ))}
             </div>
           </Card>
-        </div>
+        </section>
       </div>
     </div>
   )

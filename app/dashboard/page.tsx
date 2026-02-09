@@ -22,7 +22,6 @@ export default function DashboardPage() {
     isLoading, 
     error,
     fetchResumes,
-    createResume,
     deleteResume,
     toggleResumeVisibility,
   } = useResumeStore();
@@ -32,7 +31,6 @@ export default function DashboardPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null);
 
-  // بارگذاری رزومه‌ها هنگام ورود به صفحه
   useEffect(() => {
     fetchResumes();
   }, [fetchResumes]);
@@ -41,13 +39,9 @@ export default function DashboardPage() {
     r.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreate = async () => {
-    try {
-      const id = await createResume('رزومه جدید');
-      router.push(`/builder/${id}`);
-    } catch (err) {
-      console.error('خطا در ساخت:', err);
-    }
+  const handleCreate = async () => {  
+      router.push(`/builder`);
+
   };
 
   const handleDeleteConfirm = async () => {
@@ -69,7 +63,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* هدر */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -86,7 +79,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* آمار */}
+
       <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
           <p className="text-sm text-gray-600">تعداد رزومه‌ها</p>
@@ -108,9 +101,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* لیست رزومه‌ها */}
+
       <div className="max-w-7xl mx-auto px-4 pb-12">
-        {/* جستجو و فیلتر */}
         <Card className="p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
@@ -165,7 +157,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* مودال حذف */}
       <Modal
         isOpen={showDeleteModal}
         onClose={() => {

@@ -2,12 +2,12 @@
 
 import React from 'react'
 import { useResumeStore } from '@/store/resumeStore'
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Linkedin, 
-  Github, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Github,
   Globe,
   Calendar,
   Building,
@@ -16,7 +16,7 @@ import {
   Code,
   Award,
   Star,
-  Globe as GlobeIcon
+  Globe as GlobeIcon,
 } from 'lucide-react'
 
 const ResumePreview = () => {
@@ -27,289 +27,271 @@ const ResumePreview = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-gray-500">
         <div className="h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-          <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          <Briefcase className="h-8 w-8 text-gray-400" />
         </div>
-        <p className="text-lg">رزومه‌ای انتخاب نشده است</p>
-        <p className="text-sm mt-2">لطفا یک رزومه را از داشبورد انتخاب کنید</p>
+        <p className="text-lg font-medium">رزومه‌ای انتخاب نشده است</p>
+        <p className="text-sm mt-2">اطلاعات رزومه در حال بارگذاری است یا هنوز رزومه‌ای ساخته نشده</p>
       </div>
     )
   }
 
-  const { personal, experiences, education, skills, projects, languages, theme } = resume
+  const content = resume.content || {}
+  const {
+    personalInfo: personal = {},
+    summary = '',
+    experience: experiences = [],
+    education = [],
+    skills = [],
+    projects = [],
+    languages = [],
+  } = content
+
+  const theme = resume.theme || {
+    colors: {
+      primary: '#3b82f6',
+      secondary: '#1d4ed8',
+      accent: '#10b981',
+      background: '#ffffff',
+      text: '#1f2937',
+      header: '#111827',
+      border: '#e5e7eb',
+    },
+    typography: {
+      fontFamily: 'Vazir, system-ui, sans-serif',
+      bodySize: 1,
+      lineHeight: 1.6,
+    },
+  }
+
+  const typography = theme.typography || {
+    fontFamily: 'Vazir, system-ui, sans-serif',
+    bodySize: 1,
+    lineHeight: 1.6,
+  }
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '—'
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return '—'
+    return date.toLocaleDateString('fa-IR', { year: 'numeric', month: 'short' })
+  }
+
+  const renderSkillStars = (level: number = 3) => (
+    <div className="flex space-x-1 space-x-reverse">
+      {[1, 2, 3, 4, 5].map(star => (
+        <Star
+          key={star}
+          className={`h-4 w-4 ${star <= level ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+        />
+      ))}
+    </div>
+  )
 
   
-  const formatDate = (dateString: string) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'short'
-    })
-  }
-
-
-  const renderSkillStars = (level: number) => {
-    return (
-      <div className="flex space-x-1 space-x-reverse">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star 
-            key={star}
-            className={`h-3 w-3 ${star <= level ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-          />
-        ))}
-      </div>
-    )
-  }
-
-  const groupedSkills = skills.reduce((groups, skill) => {
-    if (!groups[skill.category]) {
-      groups[skill.category] = []
-    }
-    groups[skill.category].push(skill)
+  const groupedSkills = (skills || []).reduce((groups: Record<string, any[]>, skill: any) => {
+    const category = skill?.category || 'سایر'
+    if (!groups[category]) groups[category] = []
+    groups[category].push(skill)
     return groups
-  }, {} as Record<string, typeof skills>)
+  }, {})
 
   return (
-    <div 
-      className="a4-container bg-white shadow-xl rounded-lg overflow-hidden p-10 font-vazir"
+    <div
+      className="a4-container bg-white shadow-2xl rounded-xl overflow-hidden p-8 md:p-12 font-vazir mx-auto w-full max-w-[210mm] min-h-[297mm]"
       style={{
-        backgroundColor: theme.colors.background,
-        color: theme.colors.text,
-        fontFamily: theme.typography.fontFamily,
-        fontSize: `${theme.typography.bodySize}rem`,
-        lineHeight: theme.typography.lineHeight
+        backgroundColor: theme.colors.background || '#ffffff',
+        color: theme.colors.text || '#1f2937',
+        fontFamily: typography.fontFamily,
+        fontSize: `${typography.bodySize || 1}rem`,
+        lineHeight: typography.lineHeight || 1.6,
       }}
     >
     
-      <div className="mb-10">
-        <div className="flex justify-between items-start">
-        
+      <div className="mb-10 pb-6 border-b" style={{ borderColor: theme.colors.border }}>
+        <div className="flex flex-col md:flex-row justify-between items-start gap-6">
           <div className="flex-1">
-            <h1 
-              className="text-3xl font-bold mb-2"
-              style={{ color: theme.colors.header }}
+            <h1
+              className="text-3xl md:text-4xl font-bold mb-2"
+              style={{ color: theme.colors.header || '#111827' }}
             >
-              {personal.name || 'نام شما'}
+              {personal.name || 'نام و نام خانوادگی'}
             </h1>
+
             <p className="text-xl text-gray-600 mb-4">
-              {personal.title || 'عنوان شغلی شما'}
+              {personal.title || 'عنوان شغلی / تخصص'}
             </p>
-            
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               {personal.email && (
-                <div className="flex items-center text-sm">
-                  <Mail className="h-4 w-4 ml-2 text-gray-500" />
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   <span>{personal.email}</span>
                 </div>
               )}
-              
+
               {personal.phone && (
-                <div className="flex items-center text-sm">
-                  <Phone className="h-4 w-4 ml-2 text-gray-500" />
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   <span>{personal.phone}</span>
                 </div>
               )}
-              
+
               {personal.location && (
-                <div className="flex items-center text-sm">
-                  <MapPin className="h-4 w-4 ml-2 text-gray-500" />
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   <span>{personal.location}</span>
                 </div>
               )}
-              
+
               {personal.linkedin && (
-                <div className="flex items-center text-sm">
-                  <Linkedin className="h-4 w-4 ml-2 text-gray-500" />
-                  <a href={personal.linkedin} className="hover:underline">
+                <div className="flex items-center gap-2">
+                  <Linkedin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <a href={personal.linkedin} className="hover:underline" target="_blank" rel="noopener">
                     LinkedIn
                   </a>
                 </div>
               )}
-              
+
               {personal.github && (
-                <div className="flex items-center text-sm">
-                  <Github className="h-4 w-4 ml-2 text-gray-500" />
-                  <a href={personal.github} className="hover:underline">
+                <div className="flex items-center gap-2">
+                  <Github className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <a href={personal.github} className="hover:underline" target="_blank" rel="noopener">
                     GitHub
-                  </a>
-                </div>
-              )}
-              
-              {personal.website && (
-                <div className="flex items-center text-sm">
-                  <Globe className="h-4 w-4 ml-2 text-gray-500" />
-                  <a href={personal.website} className="hover:underline">
-                    Website
                   </a>
                 </div>
               )}
             </div>
           </div>
 
-        
-          {personal.avatar && theme.components.showPhoto && (
-            <div className="h-24 w-24 rounded-full overflow-hidden border-4" 
+    
+          {personal.avatar && (
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 flex-shrink-0 mx-auto md:mx-0"
                  style={{ borderColor: theme.colors.primary }}>
-              <img 
-                src={personal.avatar} 
-                alt={personal.name}
-                className="h-full w-full object-cover"
+              <img
+                src={personal.avatar}
+                alt={personal.name || 'عکس پروفایل'}
+                className="w-full h-full object-cover"
               />
             </div>
           )}
         </div>
 
-    
-        {personal.summary && (
-          <div className="mt-6 pt-6 border-t" style={{ borderColor: theme.colors.border }}>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-              {personal.summary}
+      
+        {summary && (
+          <div className="mt-8 pt-6 border-t" style={{ borderColor: theme.colors.border }}>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line text-justify">
+              {summary}
             </p>
           </div>
         )}
       </div>
 
-      
+  
       {experiences.length > 0 && (
-        <div className="mb-8">
-          <h2 
-            className="text-2xl font-bold mb-4 pb-2 border-b"
-            style={{ 
-              color: theme.colors.header,
-              borderColor: theme.colors.primary 
-            }}
-          >
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-5 pb-2 border-b" style={{ color: theme.colors.header, borderColor: theme.colors.primary }}>
             تجربه کاری
           </h2>
-          
-          <div className="space-y-6">
-            {experiences.map((exp, index) => (
-              <div key={index} className="relative">
-                <div className="flex justify-between items-start mb-2">
+          <div className="space-y-7">
+            {experiences.map((exp: any, index: number) => (
+              <div key={exp.id || index} className="relative pl-6 border-l-2" style={{ borderColor: theme.colors.primary }}>
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-2">
                   <div>
                     <h3 className="text-lg font-bold" style={{ color: theme.colors.primary }}>
-                      {exp.position}
+                      {exp.position || 'سمت شغلی'}
                     </h3>
-                    <div className="flex items-center text-gray-600 mt-1">
-                      <Building className="h-4 w-4 ml-2" />
-                      <span className="font-medium">{exp.company}</span>
-                      {exp.location && (
-                        <>
-                          <span className="mx-2">•</span>
-                          <MapPin className="h-4 w-4 ml-2" />
-                          <span>{exp.location}</span>
-                        </>
-                      )}
+                    <div className="flex items-center gap-2 text-gray-700 mt-1">
+                      <Building className="h-4 w-4 flex-shrink-0" />
+                      <span className="font-medium">{exp.company || 'نام شرکت'}</span>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 ml-2" />
-                    <span>
-                      {formatDate(exp.startDate)} - {exp.isCurrent ? 'تاکنون' : formatDate(exp.endDate)}
-                    </span>
+                  <div className="text-sm text-gray-600 whitespace-nowrap">
+                    {formatDate(exp.startDate)} – {exp.isCurrent ? 'تاکنون' : formatDate(exp.endDate)}
                   </div>
                 </div>
-                
+
+                {exp.location && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{exp.location}</span>
+                  </div>
+                )}
+
                 {exp.description && (
-                  <p className="text-gray-700 mt-2 leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line mt-2">
                     {exp.description}
                   </p>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-    
+  
       {education.length > 0 && (
-        <div className="mb-8">
-          <h2 
-            className="text-2xl font-bold mb-4 pb-2 border-b"
-            style={{ 
-              color: theme.colors.header,
-              borderColor: theme.colors.primary 
-            }}
-          >
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-5 pb-2 border-b" style={{ color: theme.colors.header, borderColor: theme.colors.primary }}>
             تحصیلات
           </h2>
-          
           <div className="space-y-6">
-            {education.map((edu, index) => (
-              <div key={index} className="relative">
-                <div className="flex justify-between items-start mb-2">
+            {education.map((edu: any, index: number) => (
+              <div key={edu.id || index}>
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-2">
                   <div>
                     <h3 className="text-lg font-bold" style={{ color: theme.colors.primary }}>
-                      {edu.degree} در {edu.field}
+                      {edu.degree} {edu.field ? `در ${edu.field}` : ''}
                     </h3>
-                    <div className="flex items-center text-gray-600 mt-1">
-                      <GraduationCap className="h-4 w-4 ml-2" />
-                      <span className="font-medium">{edu.school}</span>
+                    <div className="text-gray-700 mt-1">
+                      {edu.school || 'نام دانشگاه'}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 ml-2" />
-                    <span>
-                      {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-                    </span>
+                  <div className="text-sm text-gray-600 whitespace-nowrap">
+                    {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
                   </div>
                 </div>
-                
+
                 {edu.gpa && (
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm mb-2"
-                       style={{ backgroundColor: `${theme.colors.accent}20`, color: theme.colors.accent }}>
+                  <div className="inline-flex items-center px-3 py-1 mt-2 rounded-full text-sm bg-green-100 text-green-800">
                     <Award className="h-4 w-4 ml-2" />
                     معدل: {edu.gpa}
                   </div>
                 )}
-                
+
                 {edu.description && (
-                  <p className="text-gray-700 mt-2 leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-700 mt-3 whitespace-pre-line">
                     {edu.description}
                   </p>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
     
       {skills.length > 0 && (
-        <div className="mb-8">
-          <h2 
-            className="text-2xl font-bold mb-4 pb-2 border-b"
-            style={{ 
-              color: theme.colors.header,
-              borderColor: theme.colors.primary 
-            }}
-          >
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-5 pb-2 border-b" style={{ color: theme.colors.header, borderColor: theme.colors.primary }}>
             مهارت‌ها
           </h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Object.entries(groupedSkills).map(([category, categorySkills]) => (
+            {Object.entries(groupedSkills).map(([category, categorySkills]: [string, any[]]) => (
               <div key={category}>
                 <h3 className="font-bold text-lg mb-3" style={{ color: theme.colors.secondary }}>
-                  {category === 'technical' && 'فنی'}
-                  {category === 'design' && 'طراحی'}
-                  {category === 'database' && 'دیتابیس'}
-                  {category === 'language' && 'زبان'}
-                  {category === 'tool' && 'ابزارها'}
-                  {category === 'soft' && 'مهارت‌های نرم'}
-                  {category === 'business' && 'کسب و کار'}
+                  {category === 'technical' ? 'فنی' :
+                   category === 'design' ? 'طراحی' :
+                   category === 'database' ? 'دیتابیس' :
+                   category === 'language' ? 'زبان' :
+                   category === 'tool' ? 'ابزارها' :
+                   category === 'soft' ? 'مهارت‌های نرم' :
+                   category === 'business' ? 'کسب و کار' : category}
                 </h3>
-                
-                <div className="space-y-3">
-                  {categorySkills.map((skill, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Code className="h-4 w-4 ml-2 text-gray-500" />
+                <div className="space-y-2">
+                  {categorySkills.map((skill: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Code className="h-4 w-4 text-gray-500" />
                         <span>{skill.name}</span>
                       </div>
                       {renderSkillStars(skill.level)}
@@ -319,73 +301,66 @@ const ResumePreview = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-
+    
       {projects.length > 0 && (
-        <div className="mb-8">
-          <h2 
-            className="text-2xl font-bold mb-4 pb-2 border-b"
-            style={{ 
-              color: theme.colors.header,
-              borderColor: theme.colors.primary 
-            }}
-          >
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-5 pb-2 border-b" style={{ color: theme.colors.header, borderColor: theme.colors.primary }}>
             پروژه‌ها
           </h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <div 
-                key={index}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+            {projects.map((proj: any, i: number) => (
+              <div
+                key={proj.id || i}
+                className="border rounded-lg p-5 hover:shadow-md transition-shadow"
                 style={{ borderColor: theme.colors.border }}
               >
                 <h3 className="font-bold text-lg mb-2" style={{ color: theme.colors.primary }}>
-                  {project.name}
+                  {proj.name || 'نام پروژه'}
                 </h3>
-                
-                <p className="text-gray-700 text-sm mb-3">
-                  {project.description}
+
+                <p className="text-gray-700 mb-3">
+                  {proj.description || 'توضیح پروژه'}
                 </p>
-                
-                {project.technologies.length > 0 && (
+
+                {proj.technologies?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {project.technologies.map((tech, techIndex) => (
-                      <span 
-                        key={techIndex}
-                        className="px-2 py-1 text-xs rounded"
-                        style={{ 
-                          backgroundColor: `${theme.colors.accent}20`,
-                          color: theme.colors.accent
-                        }}
+                    {proj.technologies.map((tech: string, idx: number) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 text-xs rounded-full"
+                        style={{ backgroundColor: `${theme.colors.accent}15`, color: theme.colors.accent }}
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 )}
-                
-                <div className="flex gap-4">
-                  {project.link && (
-                    <a 
-                      href={project.link}
-                      className="text-sm flex items-center hover:underline"
+
+                <div className="flex flex-wrap gap-4 text-sm">
+                  {proj.link && (
+                    <a
+                      href={proj.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 hover:underline"
                       style={{ color: theme.colors.primary }}
                     >
-                      <GlobeIcon className="h-4 w-4 ml-2" />
+                      <GlobeIcon className="h-4 w-4" />
                       مشاهده پروژه
                     </a>
                   )}
-                  
-                  {project.github && (
-                    <a 
-                      href={project.github}
-                      className="text-sm flex items-center hover:underline"
+                  {proj.github && (
+                    <a
+                      href={proj.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 hover:underline"
                       style={{ color: theme.colors.primary }}
                     >
-                      <Github className="h-4 w-4 ml-2" />
+                      <Github className="h-4 w-4" />
                       کد منبع
                     </a>
                   )}
@@ -393,63 +368,39 @@ const ResumePreview = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
-      
+    
       {languages.length > 0 && (
-        <div className="mb-8">
-          <h2 
-            className="text-2xl font-bold mb-4 pb-2 border-b"
-            style={{ 
-              color: theme.colors.header,
-              borderColor: theme.colors.primary 
-            }}
-          >
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-5 pb-2 border-b" style={{ color: theme.colors.header, borderColor: theme.colors.primary }}>
             زبان‌ها
           </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {languages.map((language, index) => {
-              const [langName, level] = language.split(' (')
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {languages.map((lang: string, i: number) => {
+              const [name, level] = lang.split(' (')
               return (
-                <div 
-                  key={index}
-                  className="text-center p-3 rounded-lg"
-                  style={{ 
-                    backgroundColor: `${theme.colors.secondary}10`,
-                    border: `1px solid ${theme.colors.secondary}30`
-                  }}
+                <div
+                  key={i}
+                  className="text-center p-4 rounded-lg border"
+                  style={{ borderColor: theme.colors.border, backgroundColor: `${theme.colors.secondary}05` }}
                 >
                   <GlobeIcon className="h-6 w-6 mx-auto mb-2" style={{ color: theme.colors.secondary }} />
-                  <h3 className="font-bold">{langName}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{level?.replace(')', '')}</p>
+                  <h4 className="font-bold">{name.trim()}</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {level ? level.replace(')', '') : 'متوسط'}
+                  </p>
                 </div>
               )
             })}
           </div>
-        </div>
+        </section>
       )}
 
     
-      {!personal.name && experiences.length === 0 && education.length === 0 && 
-       skills.length === 0 && projects.length === 0 && languages.length === 0 && (
-        <div className="text-center py-20">
-          <div className="h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Briefcase className="h-8 w-8 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            رزومه خالی است
-          </h3>
-          <p className="text-gray-600 max-w-md mx-auto">
-            اطلاعات خود را در بخش‌های مختلف وارد کنید تا اینجا نمایش داده شود.
-          </p>
-        </div>
-      )}
-
-      <div className="mt-12 pt-6 border-t text-center text-sm text-gray-500"
-           style={{ borderColor: theme.colors.border }}>
-        <p>ساخته شده با ❤️ توسط رزومه‌ساز</p>
+      <div className="mt-12 pt-6 border-t text-center text-sm text-gray-500" style={{ borderColor: theme.colors.border }}>
+        <p>تهیه شده با رزومه‌ساز حرفه‌ای</p>
         <p className="mt-1">آخرین بروزرسانی: {new Date().toLocaleDateString('fa-IR')}</p>
       </div>
     </div>

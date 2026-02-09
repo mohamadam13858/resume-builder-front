@@ -2,129 +2,98 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/authStore'
 import { useResumeStore } from '@/store/resumeStore'
 import BuilderLayout from '@/components/builder/builder-layout'
 import SectionsPanel from '@/components/builder/sections-panel'
-import Alert from '@/components/ui/alert'
 import ResumePreview from '@/components/builder/resume-preview'
-import SettingsModal from '@/components/builder/settings-modal'
 import Loader from '@/components/ui/loader'
+import Alert from '@/components/ui/alert'
+import Input from '@/components/ui/input'
 
 export default function BuilderPage() {
   const params = useParams()
   const router = useRouter()
-  const { 
-    getActiveResume, 
-    setActiveResume, 
-    exportResume,
-    // updateResumeData,
-    resumes 
-  } = useResumeStore()
-  
-  const [isLoading, setIsLoading] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
-
   const resumeId = params.id as string
+  const isNew = resumeId === 'new'
+
+  const {
+    createLocalResume,
+    registerResume,
+    saveResume,
+    getResumeById,
+    setActiveResume,
+    getActiveResume,
+    updateResumeLocally,
+  } = useResumeStore()
+
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+
   const activeResume = getActiveResume()
 
   useEffect(() => {
-      const resumeExists = resumes.some(r => r.id === resumeId)
-      if (!resumeExists) {
-        setError('رزومه مورد نظر یافت نشد')
-        setIsLoading(false)
+    if (isNew) {
+      const localId = createLocalResume('رزومه بدون عنوان')
+      setActiveResume(localId)
+      setLoading(false)
+    } else {
+      const resume = getResumeById(resumeId)
+      if (!resume) {
+        setError('رزومه یافت نشد')
+        setLoading(false)
         return
       }
-
-
       setActiveResume(resumeId)
-    setIsLoading(false)
-  }, [resumeId, , router, setActiveResume])
+      setLoading(false)
+    }
+  }, [isNew, resumeId, createLocalResume, getResumeById, setActiveResume])
 
-  const handleSave = async () => {
-    if (!activeResume) return
-    
-    setSaveStatus('saving')
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-
-    //   updateResumeData({
-    //     ...activeResume,
-    //     updatedAt: new Date()
-    //   })
-      
-      setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 2000)
-    } catch (error) {
-      setError('خطا در ذخیره سازی')
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (activeResume) {
+      updateResumeLocally(activeResume.id, {
+        title: e.target.value,
+        updatedAt: new Date(),
+      })
     }
   }
 
-  const handleDownload = () => {
+  const handleFinalSave = async () => {
     if (!activeResume) return
-    
-    const resumeData = exportResume(activeResume.id)
-    const blob = new Blob([resumeData], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${activeResume.title}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+
+    setSaveStatus('saving')
+
+    try {
+      let finalId = activeResume.id
+
+      if (activeResume.id.startsWith('local-')) {
+        finalId = await registerResume(activeResume.id)
+      } else {
+        await saveResume(activeResume.id)
+      }
+
+      setSaveStatus('success')
+      setTimeout(() => router.push('/dashboard'), 1500)
+    } catch {
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 4000)
+    }
   }
 
-  const handleShare = () => {
-    if (!activeResume) return
-    
-    const shareUrl = `${window.location.origin}/view/${activeResume.id}`
-    navigator.clipboard.writeText(shareUrl)
-      .then(() => {
-        alert('لینک رزومه در کلیپ‌بورد کپی شد')
-      })
-      .catch(() => {
-        alert('خطا در کپی لینک')
-      })
-  }
-
-
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader size="lg" />
-      </div>
-    )
-  }
+  if (loading) return <div className="min-h-screen flex-center"><Loader size="lg" /></div>
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <Alert
-            variant="error"
-            message={error}
-            className="mb-4"
-          />
+      <div className="min-h-screen flex-center p-6">
+        <div className="max-w-md text-center">
+          <Alert variant="error" message={error} />
           <button
-            onClick={() => router.push('/dashboard')}
-            className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            onClick={() => router.push('/')}
+            className="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg"
           >
-            بازگشت به داشبورد
+            بازگشت به خانه
           </button>
         </div>
-      </div>
-    )
-  }
-
-  if (!activeResume) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>در حال بارگذاری...</p>
       </div>
     )
   }
@@ -134,33 +103,36 @@ export default function BuilderPage() {
       <BuilderLayout
         leftPanel={<SectionsPanel />}
         preview={<ResumePreview />}
-        onSave={handleSave}
-        onDownload={handleDownload}
-        onShare={handleShare}
-        onSettings={() => setShowSettings(true)}
-      />
-      
-      <SettingsModal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        resume={activeResume}
-      />
+        onSave={handleFinalSave}
+        onDownload={() => alert('دانلود بعداً اضافه می‌شود')}
+        onShare={() => alert('اشتراک بعداً اضافه می‌شود')}
+        onSettings={() => alert('تنظیمات بعداً اضافه می‌شود')}
+      >
+        <div className="p-4 bg-white border-b sticky top-0 z-10">
+          <Input
+            label="عنوان رزومه"
+            value={activeResume?.title || ''}
+            onChange={handleTitleChange}
+            placeholder="مثال: رزومه توسعه‌دهنده فرانت‌اند - ۱۴۰۴"
+            className="max-w-xl"
+          />
+        </div>
+      </BuilderLayout>
 
-    
       {saveStatus !== 'idle' && (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:bottom-4 md:w-64 z-50">
-          <div className={`p-4 rounded-lg shadow-lg ${
-            saveStatus === 'saving' ? 'bg-blue-500' : 'bg-green-500'
-          } text-white`}>
-            <div className="flex items-center justify-between">
-              <span>
-                {saveStatus === 'saving' ? 'در حال ذخیره...' : 'ذخیره شد!'}
-              </span>
-              {saveStatus === 'saving' && (
-                <Loader size="sm" color="text-white" />
-              )}
-            </div>
-          </div>
+        <div className="fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl shadow-xl text-white flex items-center gap-3"
+          style={{
+            background: saveStatus === 'saving' ? '#2563eb' :
+                        saveStatus === 'success' ? '#16a34a' :
+                        '#dc2626'
+          }}
+        >
+          {saveStatus === 'saving' && <Loader size="sm" color="white" />}
+          <span>
+            {saveStatus === 'saving' ? 'در حال ثبت...' :
+             saveStatus === 'success' ? 'ذخیره شد — انتقال به داشبورد' :
+             'خطا در ثبت'}
+          </span>
         </div>
       )}
     </>
