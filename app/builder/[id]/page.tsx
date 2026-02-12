@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useResumeStore } from '@/store/resumeStore'
 import BuilderLayout from '@/components/builder/builder-layout'
@@ -13,8 +13,8 @@ import Input from '@/components/ui/input'
 export default function BuilderPage() {
   const params = useParams()
   const router = useRouter()
-  const resumeId = params.id as string
-  const isNew = resumeId === 'new'
+  const resumeIdFromUrl = params.id as string
+  const isNew = resumeIdFromUrl === 'new'
 
   const {
     createLocalResume,
@@ -28,7 +28,9 @@ export default function BuilderPage() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+  const [saveStatus, setSaveStatus] = useState<
+    'idle' | 'saving' | 'success' | 'error'
+  >('idle')
 
   const activeResume = getActiveResume()
 
@@ -36,62 +38,85 @@ export default function BuilderPage() {
     if (isNew) {
       const localId = createLocalResume('رزومه بدون عنوان')
       setActiveResume(localId)
+      router.replace(`/builder/${localId}`, { scroll: false })
       setLoading(false)
     } else {
-      const resume = getResumeById(resumeId)
+      const resume = getResumeById(resumeIdFromUrl)
       if (!resume) {
-        setError('رزومه یافت نشد')
+        setError('رزومه مورد نظر یافت نشد')
         setLoading(false)
         return
       }
-      setActiveResume(resumeId)
+      setActiveResume(resumeIdFromUrl)
       setLoading(false)
     }
-  }, [isNew, resumeId, createLocalResume, getResumeById, setActiveResume])
+  }, [isNew, resumeIdFromUrl, createLocalResume, getResumeById, setActiveResume, router])
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (activeResume) {
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!activeResume) return
+
       updateResumeLocally(activeResume.id, {
-        title: e.target.value,
+        title: e.target.value.trim(),
         updatedAt: new Date(),
       })
-    }
-  }
+    },
+    [activeResume, updateResumeLocally]
+  )
 
-  const handleFinalSave = async () => {
-    if (!activeResume) return
+  const handleFinalSave = useCallback(async () => {
+    if (!activeResume) {
+      setError('هیچ رزومه‌ای برای ذخیره وجود ندارد')
+      return
+    }
+
+    if (saveStatus === 'saving') return
 
     setSaveStatus('saving')
 
     try {
-      let finalId = activeResume.id
+      let newResumeId = activeResume.id
 
       if (activeResume.id.startsWith('local-')) {
-        finalId = await registerResume(activeResume.id)
+        const serverId = await registerResume(activeResume.id)
+        if (!serverId) {
+          throw new Error('شناسه سرور برگردانده نشد')
+        }
+        updateResumeLocally(activeResume.id, { id: serverId })
+        setActiveResume(serverId)
+        router.replace(`/builder/${serverId}`, { scroll: false })
+        newResumeId = serverId
       } else {
+        console.log('[SAVE] ذخیره تغییرات رزومه موجود', { id: activeResume.id })
         await saveResume(activeResume.id)
       }
-
       setSaveStatus('success')
-      setTimeout(() => router.push('/dashboard'), 1500)
-    } catch {
+      router.push('/dashboard')
+    } catch (err: any) {
+      console.error('[SAVE] خطا در فرآیند ذخیره:', err)
       setSaveStatus('error')
-      setTimeout(() => setSaveStatus('idle'), 4000)
+      setTimeout(() => setSaveStatus('idle'), 5000)
     }
+  }, [activeResume, saveStatus, registerResume, saveResume, updateResumeLocally, setActiveResume, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader size="lg" />
+      </div>
+    )
   }
 
-  if (loading) return <div className="min-h-screen flex-center"><Loader size="lg" /></div>
-
-  if (error) {
+  if (error || !activeResume) {
     return (
-      <div className="min-h-screen flex-center p-6">
-        <div className="max-w-md text-center">
-          <Alert variant="error" message={error} />
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center space-y-6">
+          <Alert variant="error" message={error || 'رزومه بارگذاری نشد'} />
           <button
             onClick={() => router.push('/')}
-            className="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
           >
-            بازگشت به خانه
+            بازگشت به صفحه اصلی
           </button>
         </div>
       </div>
@@ -104,11 +129,12 @@ export default function BuilderPage() {
         leftPanel={<SectionsPanel />}
         preview={<ResumePreview />}
         onSave={handleFinalSave}
-        onDownload={() => alert('دانلود بعداً اضافه می‌شود')}
-        onShare={() => alert('اشتراک بعداً اضافه می‌شود')}
-        onSettings={() => alert('تنظیمات بعداً اضافه می‌شود')}
+        saveStatus={saveStatus}
+        onDownload={() => alert('قابلیت دانلود به‌زودی اضافه می‌شود')}
+        onShare={() => alert('قابلیت اشتراک‌گذاری به‌زودی اضافه می‌شود')}
+        onSettings={() => alert('تنظیمات به‌زودی اضافه می‌شود')}
       >
-        <div className="p-4 bg-white border-b sticky top-0 z-10">
+        <div className="p-4 bg-white border-b sticky top-0 z-10 shadow-sm">
           <Input
             label="عنوان رزومه"
             value={activeResume?.title || ''}
@@ -119,19 +145,27 @@ export default function BuilderPage() {
         </div>
       </BuilderLayout>
 
+  
       {saveStatus !== 'idle' && (
-        <div className="fixed bottom-6 right-6 z-50 px-6 py-3 rounded-xl shadow-xl text-white flex items-center gap-3"
+        <div
+          className={`
+            fixed bottom-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl 
+            text-white flex items-center gap-3 transition-all duration-300 min-w-[300px]
+          `}
           style={{
-            background: saveStatus === 'saving' ? '#2563eb' :
-                        saveStatus === 'success' ? '#16a34a' :
-                        '#dc2626'
+            background:
+              saveStatus === 'saving' ? '#2563eb' :
+                saveStatus === 'success' ? '#16a34a' :
+                  '#dc2626',
           }}
         >
           {saveStatus === 'saving' && <Loader size="sm" color="white" />}
-          <span>
-            {saveStatus === 'saving' ? 'در حال ثبت...' :
-             saveStatus === 'success' ? 'ذخیره شد — انتقال به داشبورد' :
-             'خطا در ثبت'}
+          <span className="font-medium">
+            {saveStatus === 'saving'
+              ? 'در حال ذخیره و ثبت رزومه...'
+              : saveStatus === 'success'
+                ? 'رزومه با موفقیت ذخیره شد — در حال انتقال به داشبورد'
+                : 'خطا در ذخیره رزومه'}
           </span>
         </div>
       )}
