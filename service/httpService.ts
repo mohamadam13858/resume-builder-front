@@ -14,14 +14,21 @@ let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
 
 const processQueue = (error: any = null) => {
-  failedQueue.forEach((prom) => {
-    error ? prom.reject(error) : prom.resolve(null);
-  });
+  failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve(null)));
   failedQueue = [];
 };
 
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (TokenService.shouldRefreshToken(300)) {
+      console.log('توکن نزدیک انقضاست → تلاش برای رفرش قبل از درخواست');
+      try {
+        await TokenService['performRefresh']()
+      } catch (err) {
+        console.warn('رفرش پیش‌دستانه ناموفق بود', err);
+      }
+    }
+
     const token = TokenService.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -34,7 +41,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest: any = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -52,38 +59,31 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = TokenService.getRefreshToken();
-
         if (!refreshToken || !TokenService.isTokenValid(refreshToken)) {
           throw new Error('Refresh token نامعتبر یا وجود ندارد');
         }
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
-        });
+
+        const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
 
         const { access_token, refresh_token } = response.data;
 
         TokenService.setTokens(
           access_token,
-          refresh_token || refreshToken, 
+          refresh_token || refreshToken,
           TokenService.getUser()
         );
-
 
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         processQueue();
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Refresh token failed:', refreshError);
-
         processQueue(refreshError);
-
-        // شکست کامل → لاگ‌اوت
         TokenService.clearTokens();
 
         if (typeof window !== 'undefined') {
           window.location.href = '/login?session_expired=true';
         }
-
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -93,10 +93,9 @@ api.interceptors.response.use(
   }
 );
 
-
 const httpService = async <T = unknown>(
   url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'GET',
   data?: any,
   config?: AxiosRequestConfig
 ): Promise<T> => {
@@ -106,7 +105,6 @@ const httpService = async <T = unknown>(
     data,
     ...config,
   });
-
   return response.data;
 };
 

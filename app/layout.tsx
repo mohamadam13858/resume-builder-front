@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Vazirmatn } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/layout/navbar'
+import AuthInitializer from '@/components/auth/AuthInitializer'
 
 
 const vazirmatn = Vazirmatn({ 

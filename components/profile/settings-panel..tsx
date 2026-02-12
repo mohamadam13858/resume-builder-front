@@ -2,22 +2,9 @@
 
 import React, { useState } from 'react'
 import Card from '@/components/ui/card'
-import Label from '@/components/ui/label'
 import Button from '@/components/ui/button'
-import Input from '@/components/ui/input'
 import { 
-  Bell, 
-  Shield, 
-  Download,
-  Eye,
-  EyeOff,
-  Mail,
-  Smartphone,
-  Globe,
-  Lock,
-  Trash2,
-  Save,
-  AlertTriangle
+  Bell, Shield, Download, Eye, EyeOff, Mail, Smartphone, Globe, Lock, Trash2, AlertTriangle, Save 
 } from 'lucide-react'
 
 const SettingsPanel = () => {
@@ -30,298 +17,200 @@ const SettingsPanel = () => {
 
   const [privacy, setPrivacy] = useState({
     profileVisibility: 'public',
-    resumeVisibility: 'private',
     showEmail: false,
     showPhone: false
   })
 
   const [security, setSecurity] = useState({
-    twoFactorAuth: false,
+    twoFactor: false,
     loginAlerts: true,
     sessionTimeout: 30
   })
 
-  const handleExportData = () => {
-    alert('درخواست خروجی داده‌ها ثبت شد. به ایمیل شما ارسال خواهد شد.')
-  }
-
-  const handleDeleteAccount = () => {
-    if (window.confirm('آیا مطمئن هستید؟ این عمل قابل بازگشت نیست!')) {
-      alert('حساب کاربری شما حذف خواهد شد.')
-    }
-  }
-
-  // Helper function for toggle switches
-  const ToggleSwitch = ({ 
-    checked, 
-    onChange 
-  }: { 
-    checked: boolean; 
-    onChange: (checked: boolean) => void 
-  }) => {
-    return (
-      <div
-        onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-          checked ? 'bg-primary' : 'bg-gray-200'
-        }`}
-      >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
-      </div>
-    )
-  }
+  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+    <div
+      onClick={onChange}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+        checked ? 'bg-indigo-600' : 'bg-gray-300'
+      }`}
+    >
+      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+    </div>
+  )
 
   return (
-    <div className="space-y-6">
-      {/* Notifications */}
-      <Card className="p-6">
-        <div className="flex items-center mb-6">
-          <Bell className="h-6 w-6 text-gray-400 ml-3" />
+    <div className="space-y-8">
+      <Card className="p-7 shadow-sm border border-gray-200/70">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-indigo-100 rounded-xl">
+            <Bell className="h-6 w-6 text-indigo-600" />
+          </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">اعلان‌ها</h3>
-            <p className="text-sm text-gray-600">تنظیمات اعلان‌های ایمیلی و درون‌برنامه‌ای</p>
+            <h3 className="text-xl font-bold">اعلان‌ها</h3>
+            <p className="text-gray-600">مدیریت نحوه دریافت اطلاع‌رسانی‌ها</p>
           </div>
         </div>
-
-        <div className="space-y-4">
-          {Object.entries(notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
+        <div className="space-y-5">
+          {Object.entries(notifications).map(([key, val]) => (
+            <div key={key} className="flex items-center justify-between py-3 border-b last:border-0">
               <div>
-                <div className="font-medium text-gray-900">
-                  {key === 'emailUpdates' && 'به‌روزرسانی‌های ایمیلی'}
-                  {key === 'resumeViews' && 'مشاهده رزومه'}
-                  {key === 'newFeatures' && 'ویژگی‌های جدید'}
-                  {key === 'marketing' && 'ایمیل‌های تبلیغاتی'}
+                <div className="font-medium">
+                  {key === 'emailUpdates' ? 'به‌روزرسانی‌ها' :
+                   key === 'resumeViews' ? 'مشاهده رزومه' :
+                   key === 'newFeatures' ? 'ویژگی‌های جدید' : 'تبلیغات'}
                 </div>
-                <div className="text-sm text-gray-600">
-                  {key === 'emailUpdates' && 'اخبار و به‌روزرسانی‌های مهم'}
-                  {key === 'resumeViews' && 'هنگامی که رزومه شما مشاهده می‌شود'}
-                  {key === 'newFeatures' && 'اطلاع از ویژگی‌های جدید پلتفرم'}
-                  {key === 'marketing' && 'پیشنهادات و تخفیف‌ها'}
+                <div className="text-sm text-gray-600 mt-0.5">
+                  {key === 'emailUpdates' && 'مهم‌ترین اخبار و تغییرات'}
+                  {key === 'resumeViews' && 'هر زمان کسی رزومه شما را دید'}
+                  {key === 'newFeatures' && 'اطلاع از امکانات تازه'}
+                  {key === 'marketing' && 'پیشنهادات ویژه و تخفیف'}
                 </div>
               </div>
-              
-              <ToggleSwitch
-                checked={value}
-                onChange={(newValue) => 
-                  setNotifications(prev => ({ ...prev, [key]: newValue }))
-                }
+              <Toggle 
+                checked={val} 
+                onChange={() => setNotifications(p => ({ ...p, [key]: !val }))} 
               />
             </div>
           ))}
         </div>
       </Card>
 
-      {/* Privacy */}
-      <Card className="p-6">
-        <div className="flex items-center mb-6">
-          <Shield className="h-6 w-6 text-gray-400 ml-3" />
+      <Card className="p-7 shadow-sm border border-gray-200/70">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-green-100 rounded-xl">
+            <Shield className="h-6 w-6 text-green-600" />
+          </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">حریم خصوصی</h3>
-            <p className="text-sm text-gray-600">کنترل اطلاعات قابل مشاهده برای دیگران</p>
+            <h3 className="text-xl font-bold">حریم خصوصی</h3>
+            <p className="text-gray-600">کنترل میزان نمایش اطلاعات</p>
           </div>
         </div>
 
-        <div className="space-y-6">
-          {/* Profile Visibility */}
+        <div className="space-y-8">
           <div>
-            <Label>نمایش پروفایل</Label>
-            <div className="grid grid-cols-3 gap-3 mt-2">
+            <label className="block font-medium mb-3">سطح نمایش پروفایل</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { value: 'public', label: 'عمومی', desc: 'همه می‌توانند ببینند' },
-                { value: 'connections', label: 'ارتباطات', desc: 'فقط کاربران مرتبط' },
-                { value: 'private', label: 'خصوصی', desc: 'فقط خود شما' }
-              ].map((option) => (
-                <div
-                  key={option.value}
-                  onClick={() => setPrivacy(prev => ({ ...prev, profileVisibility: option.value }))}
-                  className={`p-3 border rounded-lg text-center transition-colors cursor-pointer ${
-                    privacy.profileVisibility === option.value
-                      ? 'border-primary bg-primary/5'
+                { v: 'public', t: 'عمومی', d: 'همه می‌بینند' },
+                { v: 'connections', t: 'ارتباطات', d: 'فقط افراد مرتبط' },
+                { v: 'private', t: 'خصوصی', d: 'فقط خودتان' }
+              ].map(opt => (
+                <button
+                  key={opt.v}
+                  onClick={() => setPrivacy(p => ({ ...p, profileVisibility: opt.v }))}
+                  className={`p-5 border rounded-xl text-center transition-all ${
+                    privacy.profileVisibility === opt.v 
+                      ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200' 
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className="font-medium">{option.label}</div>
-                  <div className="text-xs text-gray-500 mt-1">{option.desc}</div>
-                </div>
+                  <div className="font-semibold">{opt.t}</div>
+                  <div className="text-sm text-gray-500 mt-1">{opt.d}</div>
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Contact Info Visibility */}
-          <div>
-            <Label>اطلاعات تماس</Label>
-            <div className="grid grid-cols-2 gap-4 mt-2">
-              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <Mail className="h-5 w-5 text-gray-400 ml-2" />
-                  <span>نمایش ایمیل</span>
-                </div>
-                <ToggleSwitch
-                  checked={privacy.showEmail}
-                  onChange={(newValue) => 
-                    setPrivacy(prev => ({ ...prev, showEmail: newValue }))
-                  }
-                />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="flex items-center justify-between p-5 border rounded-xl">
+              <div className="flex items-center gap-3">
+                <Mail className="h-5 w-5 text-gray-500" />
+                <span>نمایش ایمیل</span>
               </div>
-
-              <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                <div className="flex items-center">
-                  <Smartphone className="h-5 w-5 text-gray-400 ml-2" />
-                  <span>نمایش تلفن</span>
-                </div>
-                <ToggleSwitch
-                  checked={privacy.showPhone}
-                  onChange={(newValue) => 
-                    setPrivacy(prev => ({ ...prev, showPhone: newValue }))
-                  }
-                />
+              <Toggle 
+                checked={privacy.showEmail} 
+                onChange={() => setPrivacy(p => ({ ...p, showEmail: !p.showEmail }))} 
+              />
+            </div>
+            <div className="flex items-center justify-between p-5 border rounded-xl">
+              <div className="flex items-center gap-3">
+                <Smartphone className="h-5 w-5 text-gray-500" />
+                <span>نمایش شماره تلفن</span>
               </div>
+              <Toggle 
+                checked={privacy.showPhone} 
+                onChange={() => setPrivacy(p => ({ ...p, showPhone: !p.showPhone }))} 
+              />
             </div>
           </div>
         </div>
       </Card>
 
-      {/* Security */}
-      <Card className="p-6">
-        <div className="flex items-center mb-6">
-          <Lock className="h-6 w-6 text-gray-400 ml-3" />
+    
+      <Card className="p-7 shadow-sm border border-gray-200/70">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-amber-100 rounded-xl">
+            <Lock className="h-6 w-6 text-amber-600" />
+          </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">امنیت</h3>
-            <p className="text-sm text-gray-600">تنظیمات امنیتی حساب کاربری</p>
+            <h3 className="text-xl font-bold">امنیت</h3>
+            <p className="text-gray-600">تنظیمات حفاظتی حساب</p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          {/* Two-Factor Auth */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between p-5 border rounded-xl">
             <div>
-              <div className="font-medium text-gray-900">احراز هویت دو مرحله‌ای</div>
-              <div className="text-sm text-gray-600">افزایش امنیت حساب کاربری</div>
+              <div className="font-medium">احراز هویت دو مرحله‌ای</div>
+              <div className="text-sm text-gray-600 mt-1">امنیت بسیار بالاتر</div>
             </div>
-            <ToggleSwitch
-              checked={security.twoFactorAuth}
-              onChange={(newValue) => 
-                setSecurity(prev => ({ ...prev, twoFactorAuth: newValue }))
-              }
+            <Toggle 
+              checked={security.twoFactor} 
+              onChange={() => setSecurity(p => ({ ...p, twoFactor: !p.twoFactor }))} 
             />
           </div>
 
-          {/* Login Alerts */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-5 border rounded-xl">
             <div>
-              <div className="font-medium text-gray-900">هشدار ورود</div>
-              <div className="text-sm text-gray-600">اعلان ورود از دستگاه جدید</div>
+              <div className="font-medium">هشدار ورود از دستگاه جدید</div>
+              <div className="text-sm text-gray-600 mt-1">ارسال اعلان در صورت ورود مشکوک</div>
             </div>
-            <ToggleSwitch
-              checked={security.loginAlerts}
-              onChange={(newValue) => 
-                setSecurity(prev => ({ ...prev, loginAlerts: newValue }))
-              }
+            <Toggle 
+              checked={security.loginAlerts} 
+              onChange={() => setSecurity(p => ({ ...p, loginAlerts: !p.loginAlerts }))} 
             />
           </div>
 
-          {/* Session Timeout */}
           <div>
-            <Label>مدت زمان نشست (دقیقه)</Label>
-            <div className="flex items-center space-x-4 space-x-reverse mt-2">
+            <label className="block font-medium mb-3">خروج خودکار پس از عدم فعالیت (دقیقه)</label>
+            <div className="flex items-center gap-4">
               <input
                 type="range"
                 min="5"
                 max="120"
                 step="5"
                 value={security.sessionTimeout}
-                onChange={(e) => setSecurity(prev => ({ ...prev, sessionTimeout: parseInt(e.target.value) }))}
-                className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                onChange={e => setSecurity(p => ({ ...p, sessionTimeout: Number(e.target.value) }))}
+                className="flex-1 h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-indigo-600"
               />
-              <span className="font-medium w-12">{security.sessionTimeout}</span>
+              <span className="font-bold w-12 text-center">{security.sessionTimeout}</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              بعد از این مدت زمان عدم فعالیت، به طور خودکار از حساب خارج می‌شوید
-            </p>
           </div>
         </div>
       </Card>
 
-      {/* Data Management */}
-      <Card className="p-6">
-        <div className="flex items-center mb-6">
-          <Download className="h-6 w-6 text-gray-400 ml-3" />
+    
+      <Card className="p-7 border-red-200 bg-red-50/50 shadow-sm">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-red-100 rounded-xl">
+            <AlertTriangle className="h-6 w-6 text-red-600" />
+          </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">مدیریت داده‌ها</h3>
-            <p className="text-sm text-gray-600">خروجی و مدیریت داده‌های حساب</p>
+            <h3 className="text-xl font-bold text-red-900">ناحیه خطر</h3>
+            <p className="text-red-700">اقدامات غیرقابل بازگشت</p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <div className="space-y-5">
+          <div className="flex items-center justify-between p-5 bg-white border border-red-200 rounded-xl">
             <div>
-              <div className="font-medium text-gray-900">خروجی داده‌ها</div>
-              <div className="text-sm text-gray-600">دریافت تمام اطلاعات حساب به صورت JSON</div>
+              <div className="font-medium text-red-900">حذف حساب کاربری</div>
+              <div className="text-sm text-red-700 mt-1">تمام اطلاعات برای همیشه پاک می‌شود</div>
             </div>
-            <Button variant="outline" onClick={handleExportData}>
-              درخواست خروجی
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <div className="font-medium text-gray-900">حذف موقت حساب</div>
-              <div className="text-sm text-gray-600">غیرفعال کردن موقت حساب کاربری</div>
-            </div>
-            <Button variant="outline" className="text-yellow-600 border-yellow-300">
-              غیرفعال کردن
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Danger Zone */}
-      <Card className="p-6 border-red-200 bg-red-50">
-        <div className="flex items-center mb-6">
-          <AlertTriangle className="h-6 w-6 text-red-400 ml-3" />
-          <div>
-            <h3 className="text-lg font-semibold text-red-900">ناحیه خطر</h3>
-            <p className="text-sm text-red-700">این اقدامات قابل بازگشت نیستند</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-white">
-            <div>
-              <div className="font-medium text-red-900">حذف تمام رزومه‌ها</div>
-              <div className="text-sm text-red-700">همه رزومه‌های شما حذف خواهند شد</div>
-            </div>
-            <Button variant="danger" size="sm">
-              حذف رزومه‌ها
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-white">
-            <div>
-              <div className="font-medium text-red-900">حذف دائم حساب کاربری</div>
-              <div className="text-sm text-red-700">تمام اطلاعات شما برای همیشه حذف می‌شود</div>
-            </div>
-            <Button
-              variant="danger"
-              size="sm"
-              leftIcon={<Trash2 className="h-4 w-4" />}
-              onClick={handleDeleteAccount}
-            >
+            <Button variant="danger" size="sm" onClick={() => confirm('مطمئن هستید؟') && alert('حذف انجام شد')}>
               حذف حساب
             </Button>
           </div>
-        </div>
-
-        <div className="mt-6 p-3 bg-red-100 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">
-            ⚠️ توجه: پس از حذف حساب، تمام اطلاعات شما شامل رزومه‌ها، تنظیمات و تاریخچه 
-            به طور کامل حذف شده و قابل بازیابی نخواهند بود.
-          </p>
         </div>
       </Card>
     </div>

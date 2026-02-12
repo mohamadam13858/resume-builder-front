@@ -3,196 +3,155 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
-import Tabs from '@/components/ui/tabs'
 import Card from '@/components/ui/card'
 import ProfileForm from '@/components/profile/profile-form'
+import ThemeCustomizer from '@/components/profile/theme-customizer'
+import ResumeList from '@/components/profile/resume-list'
 
-import { 
-  User, 
-  FileText, 
-  Palette, 
+import {
+  User,
+  FileText,
+  Palette,
   Settings,
   Download,
   Shield,
   Bell,
   CreditCard,
-  LogOut
+  LogOut,
+  ChevronLeft,
 } from 'lucide-react'
-import ThemeCustomizer from '@/components/profile/theme-customizer'
 import SettingsPanel from '@/components/profile/settings-panel.'
-import ResumeList from '@/components/profile/resume-list'
 
-const ProfilePage = () => {
+const tabs = [
+  { id: 'profile', label: 'پروفایل', icon: User },
+  { id: 'resumes', label: 'رزومه‌ها', icon: FileText },
+  { id: 'appearance', label: 'ظاهر', icon: Palette },
+  { id: 'settings', label: 'تنظیمات', icon: Settings },
+]
+
+export default function ProfilePage() {
   const router = useRouter()
-  const { user, isAuthenticated, logout } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const [activeTab, setActiveTab] = useState('profile')
 
-  
-  if (!isAuthenticated) {
-    router.push('/login')
-    return null
-  }
-
-  const tabs = [
-    { id: 'profile', label: 'پروفایل', icon: <User className="h-5 w-5" /> },
-    { id: 'resumes', label: 'رزومه‌ها', icon: <FileText className="h-5 w-5" /> },
-    { id: 'appearance', label: 'ظاهر', icon: <Palette className="h-5 w-5" /> },
-    { id: 'settings', label: 'تنظیمات', icon: <Settings className="h-5 w-5" /> }
-  ]
-
   const handleLogout = () => {
-    logout()
-    router.push('/login')
+    if (window.confirm('آیا مطمئن هستید که می‌خواهید خارج شوید؟')) {
+      logout()
+      document.cookie = 'auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      router.push('/login')
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-    
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                تنظیمات حساب کاربری
-              </h1>
-              <p className="text-gray-600 mt-1">
-                مدیریت پروفایل و تنظیمات شخصی
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-2xl shadow-lg border-2 border-white/30">
+                  {user?.name?.substring(0, 2).toUpperCase() || 'U'}
+                </div>
+                <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-green-400 rounded-full border-2 border-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">{user?.name || 'کاربر'}</h1>
+                <p className="text-indigo-100 mt-1 opacity-90">{user?.email}</p>
+              </div>
             </div>
-            
-            <div className="mt-4 md:mt-0 flex items-center space-x-3 space-x-reverse">
-              <button
-                onClick={handleLogout}
-                className="flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <LogOut className="h-4 w-4 ml-2" />
-                خروج
-              </button>
-            </div>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-white font-medium transition-all duration-200 border border-white/20 hover:border-white/40"
+            >
+              <LogOut className="h-4 w-4" />
+              خروج
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          <div className="lg:col-span-1">
-            <Card className="p-4">
-            
-              <div className="flex items-center space-x-3 space-x-reverse mb-6 pb-6 border-b">
-                <div className="h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">
-                  {user?.name?.substring(0, 2) || 'U'}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{user?.name}</h3>
-                  <p className="text-sm text-gray-500">{user?.email}</p>
-                </div>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
-            
-              <nav className="space-y-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-primary text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span className="ml-2">{tab.icon}</span>
-                    {tab.label}
-                  </button>
-                ))}
-              </nav>
-
-              
-              <div className="mt-8 pt-6 border-t">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  آمار سریع
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">تعداد رزومه‌ها</span>
-                    <span className="font-medium">12</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">دانلود‌ها</span>
-                    <span className="font-medium">24</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">عضویت از</span>
-                    <span className="font-medium">1402/10/15</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-        
-            <Card className="mt-4 p-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">
-                اقدامات سریع
-              </h4>
-              <div className="space-y-2">
-                <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                  <span className="flex items-center">
-                    <Download className="h-4 w-4 ml-2" />
-                    خروجی داده‌ها
-                  </span>
-                </button>
-                <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                  <span className="flex items-center">
-                    <Shield className="h-4 w-4 ml-2" />
-                    حریم خصوصی
-                  </span>
-                </button>
-                <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                  <span className="flex items-center">
-                    <Bell className="h-4 w-4 ml-2" />
-                    نوتیفیکیشن
-                  </span>
-                </button>
-                <button className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                  <span className="flex items-center">
-                    <CreditCard className="h-4 w-4 ml-2" />
-                    اشتراک
-                  </span>
-                </button>
-              </div>
-            </Card>
-          </div>
-
-          
           <div className="lg:col-span-3">
-            {activeTab === 'profile' && (
-              <Card className="p-6">
-                <ProfileForm />
+            <div className="lg:sticky lg:top-8 space-y-6">
+
+    
+              <Card className="p-6 shadow-sm border border-gray-200/70 bg-white/80 backdrop-blur-sm">
+                <h3 className="text-lg font-semibold mb-5 text-gray-800">آمار سریع</h3>
+                <div className="space-y-4 text-sm">
+                  {[
+                    { label: 'تعداد رزومه‌ها', value: '12' },
+                    { label: 'دانلود‌ها', value: '24' },
+                    { label: 'عضویت از', value: '۱۴۰۲/۱۰/۱۵' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex justify-between items-center">
+                      <span className="text-gray-600">{item.label}</span>
+                      <span className="font-medium text-gray-900">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
               </Card>
-            )}
 
-            {activeTab === 'resumes' && (
-              <div className="space-y-6">
-                <ResumeList />
-              </div>
-            )}
+      
+              <Card className="p-3 shadow-sm border border-gray-200/70 bg-white/80 backdrop-blur-sm">
+                <nav className="space-y-1">
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon
+                    const isActive = activeTab === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`
+                          w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
+                          ${isActive 
+                            ? 'bg-indigo-50 text-indigo-700 shadow-sm' 
+                            : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600'
+                          }
+                        `}
+                      >
+                        <Icon className={`h-5 w-5 ${isActive ? 'text-indigo-600' : 'text-gray-500'}`} />
+                        {tab.label}
+                        {isActive && <ChevronLeft className="h-4 w-4 mr-auto" />}
+                      </button>
+                    )
+                  })}
+                </nav>
+              </Card>
 
-            {activeTab === 'appearance' && (
-              <div className="space-y-6">
-                <ThemeCustomizer />
-              </div>
-            )}
-
-            {activeTab === 'settings' && (
-              <div className="space-y-6">
-                <SettingsPanel />
-              </div>
-            )}
+              <Card className="p-4 shadow-sm border border-gray-200/70 bg-white/80 backdrop-blur-sm hidden lg:block">
+                <h4 className="text-sm font-medium text-gray-800 mb-4">اقدامات سریع</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {[
+                    { icon: Download, label: 'خروجی داده' },
+                    { icon: Shield, label: 'حریم خصوصی' },
+                    { icon: Bell, label: 'اعلان‌ها' },
+                    { icon: CreditCard, label: 'اشتراک' },
+                  ].map((action, i) => (
+                    <button
+                      key={i}
+                      className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                    >
+                      <action.icon className="h-5 w-5 text-gray-500" />
+                      <span>{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </div>
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 md:p-8 shadow-md border border-gray-200/60 bg-white">
+              {activeTab === 'profile' && <ProfileForm />}
+              {activeTab === 'resumes' && <ResumeList />}
+              {activeTab === 'appearance' && <ThemeCustomizer />}
+              {activeTab === 'settings' && <SettingsPanel />}
+            </Card>
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-export default ProfilePage

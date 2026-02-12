@@ -39,7 +39,8 @@ const Avatar: React.FC<AvatarProps> = ({
         <img 
           src={src} 
           alt={alt}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
+          loading='lazy'
         />
       )
     } else if (initials) {
