@@ -79,6 +79,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error('Refresh token failed:', refreshError);
         processQueue(refreshError);
+        
         TokenService.clearTokens();
 
         if (typeof window !== 'undefined') {

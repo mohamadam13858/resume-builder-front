@@ -61,7 +61,7 @@ export class TokenService {
       const timeLeft = decoded.exp - currentTime;
       return timeLeft < thresholdSeconds;
     } catch {
-      return true; 
+      return true;
     }
   }
 
@@ -72,6 +72,7 @@ export class TokenService {
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem('auth-storage');
+    document.cookie = 'auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
@@ -122,7 +123,7 @@ export class TokenService {
       this.setTokens(
         access_token,
         refresh_token || refreshToken,
-        this.getUser() 
+        this.getUser()
       );
 
       console.log('توکن با موفقیت به‌روزرسانی شد (proactive)');
@@ -147,10 +148,10 @@ export class TokenService {
       const decoded = jwtDecode<TokenPayload>(token);
       const currentTime = Date.now() / 1000;
       let timeUntilExpiry = decoded.exp - currentTime;
-      const refreshBeforeSeconds = 300; 
+      const refreshBeforeSeconds = 300;
       let delayMs = (timeUntilExpiry - refreshBeforeSeconds) * 1000;
 
-      if (delayMs < 60000) delayMs = 60000; 
+      if (delayMs < 60000) delayMs = 60000;
       if (delayMs <= 0) {
         this.performRefresh();
         return;
