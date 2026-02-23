@@ -19,7 +19,7 @@ export default function AuthLayout({
 }) {
   return (
     <div lang="fa" dir="rtl" className={vazirmatn.variable}>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-liner-to-br from-gray-50 to-gray-100">
         <div className="min-h-screen flex flex-col">
         
           <header className="py-4 px-6">

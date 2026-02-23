@@ -133,7 +133,7 @@ export default function BuilderHomePage() {
                   این موارد شانس دیده شدن رزومه‌ات را بالا می‌برند
                 </p>
               </div>
-              <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800">
+              <Button variant="primary" size="sm" className="text-indigo-600 hover:text-indigo-800">
                 همه نکات →
               </Button>
             </div>
