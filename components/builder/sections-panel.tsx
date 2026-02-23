@@ -42,21 +42,21 @@ const SectionsPanel = () => {
       enabled: true,
       order: 1
     },
-    {
-      id: 'summary',
-      title: 'خلاصه',
-      icon: <FileText className="h-5 w-5" />,
-      component: <div>خلاصه Form</div>,
-      enabled: true,
-      order: 2
-    },
+    // {
+    //   id: 'summary',
+    //   title: 'خلاصه',
+    //   icon: <FileText className="h-5 w-5" />,
+    //   component: <div>خلاصه Form</div>,
+    //   enabled: true,
+    //   order: 2
+    // },
     {
       id: 'experience',
       title: 'تجربه کاری',
       icon: <Briefcase className="h-5 w-5" />,
       component: <ExperienceForm />,
       enabled: true,
-      order: 3
+      order: 2
     },
     {
       id: 'education',
@@ -64,7 +64,7 @@ const SectionsPanel = () => {
       icon: <GraduationCap className="h-5 w-5" />,
       component: <EducationForm />,
       enabled: true,
-      order: 4
+      order: 3
     },
     {
       id: 'skills',
@@ -72,7 +72,7 @@ const SectionsPanel = () => {
       icon: <Code className="h-5 w-5" />,
       component: <SkillsForm />,
       enabled: true,
-      order: 5
+      order: 4
     },
     {
       id: 'projects',
@@ -80,7 +80,7 @@ const SectionsPanel = () => {
       icon: <Award className="h-5 w-5" />,
       component: <ProjectsForm />,
       enabled: false,
-      order: 6
+      order: 5
     },
     {
       id: 'languages',
@@ -88,7 +88,7 @@ const SectionsPanel = () => {
       icon: <Globe className="h-5 w-5" />,
       component: <LanguagesForm />,
       enabled: false,
-      order: 7
+      order: 6
     }
   ])
 
@@ -117,7 +117,6 @@ const SectionsPanel = () => {
 
   return (
     <div className="space-y-4">
-      {/* Enabled Sections */}
       <div className="space-y-2">
         <h3 className="text-sm font-medium text-gray-700">
           بخش‌های فعال
@@ -131,7 +130,6 @@ const SectionsPanel = () => {
               key={section.id}
               className="border border-gray-200 rounded-lg overflow-hidden"
             >
-              {/* Section Header */}
               <div
                 onClick={() => toggleSection(section.id)}
                 className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors cursor-pointer"
@@ -164,7 +162,6 @@ const SectionsPanel = () => {
                 </div>
               </div>
 
-              {/* Section Content */}
               {expandedSection === section.id && (
                 <div className="border-t border-gray-200 p-4 bg-gray-50">
                   {section.component}
@@ -173,8 +170,6 @@ const SectionsPanel = () => {
             </div>
           ))}
       </div>
-
-      {/* Disabled Sections */}
       {sections.filter(section => !section.enabled).length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-gray-700">
@@ -215,7 +210,6 @@ const SectionsPanel = () => {
         </div>
       )}
 
-      {/* Add Custom Section */}
       <div
         onClick={addNewSection}
         className="w-full flex items-center justify-center p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-colors cursor-pointer"
@@ -223,8 +217,6 @@ const SectionsPanel = () => {
         <Plus className="h-5 w-5 ml-2" />
         <span>افزودن بخش جدید</span>
       </div>
-
-      {/* Section Order Info */}
       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-700">
           💡 می‌توانید بخش‌ها را با کشیدن و رها کردن مرتب کنید

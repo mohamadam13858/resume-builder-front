@@ -82,9 +82,9 @@ api.interceptors.response.use(
         
         TokenService.clearTokens();
 
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login?session_expired=true';
-        }
+            // if (typeof window !== 'undefined') {
+            //   window.location.href = '/login?session_expired=true';
+            // }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
