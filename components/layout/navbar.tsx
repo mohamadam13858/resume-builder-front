@@ -18,6 +18,8 @@ import {
 } from 'lucide-react'
 import Button from '@/components/ui/button'
 import Avatar from '@/components/ui/avatar'
+import httpService from '@/service/httpService'
+import { TokenService } from '@/service/tokenService'
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -25,11 +27,16 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
 
-  const handleLogout = () => {
-    logout()
-    // document.cookie = 'auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    router.push('/login')
-  }
+  const handleLogout = async () => {
+    try {
+      await httpService('/auth/logout', 'POST', {}, { withCredentials: true });
+    } catch (err) {
+      console.warn('Logout API failed, clearing local anyway', err);
+    }
+
+    TokenService.clearTokens();
+    router.push('/login');
+  };
 
   const navLinks = [
     { href: '/', label: 'خانه', icon: <Home className="h-5 w-5" /> },

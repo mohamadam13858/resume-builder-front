@@ -12,8 +12,7 @@ export function middleware(request: NextRequest) {
   if (PUBLIC_PATHS.includes(pathname) || pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
-
-  const isLoggedIn = request.cookies.has('auth_session');
+  const isLoggedIn = request.cookies.has('refresh_token');
 
   if (!isLoggedIn) {
     const loginUrl = new URL('/login', request.url);

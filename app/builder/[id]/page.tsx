@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useResumeStore } from '@/store/resumeStore'
 import BuilderLayout from '@/components/builder/builder-layout'
@@ -9,6 +9,7 @@ import ResumePreview from '@/components/builder/resume-preview'
 import Loader from '@/components/ui/loader'
 import Alert from '@/components/ui/alert'
 import Input from '@/components/ui/input'
+import html2pdf from 'html2pdf.js';
 
 export default function BuilderPage() {
   const params = useParams()
@@ -26,6 +27,7 @@ export default function BuilderPage() {
     updateResumeLocally,
   } = useResumeStore()
 
+  const previewRef = useRef<HTMLDivElement>(null); 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<
@@ -63,6 +65,31 @@ export default function BuilderPage() {
     },
     [activeResume, updateResumeLocally]
   )
+
+
+
+  const handleDownload = async () => {
+    if (!previewRef.current) return;
+
+    const element = previewRef.current;
+
+    const opt = {
+      margin:       0.5,     
+      filename:     `${activeResume?.title || 'رزومه'}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] },
+    };
+
+    try {
+      await html2pdf().set(opt).from(element).save();
+      alert('دانلود با موفقیت انجام شد!');
+    } catch (err) {
+      console.error('خطا در ساخت PDF:', err);
+      alert('خطا در دانلود PDF');
+    }
+  };
 
   const handleFinalSave = useCallback(async () => {
     if (!activeResume) {
@@ -130,7 +157,7 @@ export default function BuilderPage() {
         preview={<ResumePreview />}
         onSave={handleFinalSave}
         saveStatus={saveStatus}
-        onDownload={() => alert('قابلیت دانلود به‌زودی اضافه می‌شود')}
+        onDownload={handleDownload}
         onShare={() => alert('قابلیت اشتراک‌گذاری به‌زودی اضافه می‌شود')}
         onSettings={() => alert('تنظیمات به‌زودی اضافه می‌شود')}
       >
